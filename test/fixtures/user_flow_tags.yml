@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  tag: one
+  user_flow: one
+  column_4: MyString
+
+two:
+  tag: two
+  user_flow: two
+  column_4: MyString

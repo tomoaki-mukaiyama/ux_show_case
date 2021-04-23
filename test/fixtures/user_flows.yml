@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  product: one
+  platform: one
+  bg_color: MyString
+  icon_path: MyString
+  version: MyString
+  video_time_string: MyString
+  video_path: MyString
+
+two:
+  product: two
+  platform: two
+  bg_color: MyString
+  icon_path: MyString
+  version: MyString
+  video_time_string: MyString
+  video_path: MyString

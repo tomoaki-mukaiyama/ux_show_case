@@ -1,0 +1,9 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  screen_shot: one
+  tag: one
+
+two:
+  screen_shot: two
+  tag: two
