@@ -10,6 +10,78 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 0) do
+ActiveRecord::Schema.define(version: 2021_04_23_145018) do
 
+  create_table "platforms", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.string "name"
+    t.string "description"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "screen_shot_tags", force: :cascade do |t|
+    t.integer "screen_shot_id", null: false
+    t.integer "tag_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["screen_shot_id"], name: "index_screen_shot_tags_on_screen_shot_id"
+    t.index ["tag_id"], name: "index_screen_shot_tags_on_tag_id"
+  end
+
+  create_table "screen_shots", force: :cascade do |t|
+    t.integer "product_id", null: false
+    t.integer "platform_id", null: false
+    t.string "path"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["platform_id"], name: "index_screen_shots_on_platform_id"
+    t.index ["product_id"], name: "index_screen_shots_on_product_id"
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.boolean "IsFlowTag"
+    t.string "isTop"
+    t.string "isRecommend"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "user_flow_tags", force: :cascade do |t|
+    t.integer "tag_id", null: false
+    t.integer "user_flow_id", null: false
+    t.string "column_4"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["tag_id"], name: "index_user_flow_tags_on_tag_id"
+    t.index ["user_flow_id"], name: "index_user_flow_tags_on_user_flow_id"
+  end
+
+  create_table "user_flows", force: :cascade do |t|
+    t.integer "product_id", null: false
+    t.integer "platform_id", null: false
+    t.string "bg_color"
+    t.string "icon_path"
+    t.string "version"
+    t.string "video_time_string"
+    t.string "video_path"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["platform_id"], name: "index_user_flows_on_platform_id"
+    t.index ["product_id"], name: "index_user_flows_on_product_id"
+  end
+
+  add_foreign_key "screen_shot_tags", "screen_shots"
+  add_foreign_key "screen_shot_tags", "tags"
+  add_foreign_key "screen_shots", "platforms"
+  add_foreign_key "screen_shots", "products"
+  add_foreign_key "user_flow_tags", "tags"
+  add_foreign_key "user_flow_tags", "user_flows"
+  add_foreign_key "user_flows", "platforms"
+  add_foreign_key "user_flows", "products"
 end
