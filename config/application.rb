@@ -35,3 +35,13 @@ module UxShowCase
     config.api_only = true
   end
 end
+
+# Permit cross origin
+config.middleware.insert_before 0, Rack::Cors do
+  allow do
+    origins "*"
+    resource "*",
+      headers: :any,
+      methods: [:get, :post, :options, :head]
+  end
+end
