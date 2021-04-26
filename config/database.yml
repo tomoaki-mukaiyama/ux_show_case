@@ -49,6 +49,6 @@ test:
 #
 production:
   <<: *default
-  database: ux_show_case_production
-  username: ux_show_case
-  password: <%= ENV['UX_SHOW_CASE_DATABASE_PASSWORD'] %>
+  database: <%= ENV['DB_HEROKU_NAME'] %>
+  username: <%= ENV['DB_HEROKU_USERNAME'] %>
+  password: <%= ENV['DB_HEROKU_PASSWORD'] %>
