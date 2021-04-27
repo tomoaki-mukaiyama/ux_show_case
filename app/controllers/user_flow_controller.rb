@@ -2,10 +2,10 @@ class UserFlowController < ApplicationController
   def title
     render json: {title: 'uxshowcase'}
   end
-
+  
   def tag_index
-    #全タグ取り出して、一つ一つの:nameをjson形式で配列に入れる
-    @tags = Tag.where(IsFlowTag: 1)
+    #IsFlowTagの値が1のやつを全取得、json形式で配列に入れる
+    @tags = Tag.where(tag_type: 1)
     @tags_array = []
     @tags.each do |tag|
       @tags_array << tag.as_json(only:[:name])
