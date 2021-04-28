@@ -4,7 +4,7 @@ class UserFlowController < ApplicationController
   end
   
   def tag_index
-    #IsFlowTagの値が1のやつを全取得、json形式で配列に入れる
+    #tag_typeの値が1のやつ(UserFlowのタグ)を全取得、json形式で配列に入れる
     @tags = Tag.where(tag_type: 1)
     @tags_array = []
     @tags.each do |tag|

@@ -6,4 +6,6 @@ Rails.application.routes.draw do
   get "userflow-tag/recommend", to: "user_flow#tag_recommend"
 
   get "screenshot-tag", to: "screenshot#tag_index"
+
+  get "/screen_shots" , to: "screenshot#latest"
 end
