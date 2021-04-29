@@ -49,14 +49,14 @@ class UserFlowController < ApplicationController
       @userflows.each do|u|
         @userflows_array << u.as_json(except:[:id, :product_id, :platform_id],include:{tags:{only:[:name,:isTop,:isRecommend]}}) #配列に入れる
       end
-    else            #タグ指定なし
-      @userflows.each do|u|
-        @userflows_array << u.as_json(only:[:path],include:{tags: {only: :name}}) #配列に入れる
-      end
-
+  else            #タグ指定なし
+    @userflows.each do|u|
+      @userflows_array << u.as_json(except:[:id, :product_id, :platform_id],include:{tags:{only:[:name,:isTop,:isRecommend]}}) #配列に入れる
     end
 
-    render json: {useflows: @userflows_array}
+  end
+
+    render json: {userflows: @userflows_array}
   end
 
 end
