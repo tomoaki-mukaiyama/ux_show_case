@@ -10,19 +10,31 @@ class ScreenshotController < ApplicationController
     render json: {screenshot_tags: @tags_array}
   end
   
-  #------------最新のscreenshotを取得----------------
+  #------------最新のscreenshot取得----------------
   def latest
+    page_size = params[:limit].to_i
+    page_num  = params[:page].to_i - 1
+
+    #全スクショ最新順取得＆limit&page指定 => @screenshotsに代入
+    @screenshots = ScreenShot.includes(:tags)
+                             .order(created_at: :desc)
+                             .limit(page_size)
+                             .offset(page_num * page_size)
+   
     @screenshots_array = []
-    @screenshots = ScreenShot.includes(:tags).order(created_at: :desc)
-    @screenshots.each{|s|@screenshots_array << s.as_json(only:[:path],include:{tags: {only: :name}})}
+    if params[:tag] #タグ指定あり
+    @screenshots = @screenshots.where(tags:{id:params[:tag]}) #指定タグで絞る
+      @screenshots.each do|s|
+        @screenshots_array << s.as_json(only:[:path],include:{tags: {only: :name}}) #配列に入れる
+      end
+    else            #タグ指定なし
+      @screenshots.each do|s|
+        @screenshots_array << s.as_json(only:[:path],include:{tags: {only: :name}}) #配列に入れる
+      end
+    end
     
-    # byebug
-    
-    # s.as_json(only:[:path],include:{tags: {only: :name}})
-    #↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
-    # {"path"=>"test/path1", "tags"=>[{"name"=>"test_name_1"}]}
-    
-    render json: {screenshots: @screenshots_array}
-    
+    render json: {screenshots: @screenshots_array} #発射
   end
 end
+
+# byebug  
