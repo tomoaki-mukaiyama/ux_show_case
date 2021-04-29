@@ -56,7 +56,7 @@ class UserFlowController < ApplicationController
 
     end
 
-    render json: {screenshots: @userflows_array}
+    render json: {useflows: @userflows_array}
   end
 
 end
