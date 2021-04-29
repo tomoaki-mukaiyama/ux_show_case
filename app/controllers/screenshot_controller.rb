@@ -35,6 +35,7 @@ class ScreenshotController < ApplicationController
     
     render json: {screenshots: @screenshots_array} #発射
   end
+  
 end
 
 # byebug  
