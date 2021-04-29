@@ -12,24 +12,17 @@ class ScreenshotController < ApplicationController
   
   #------------最新のscreenshotを取得----------------
   def latest
-    @tags_array = []#空の配列セット
-
-    if params[:tag] #タグ指定ある場合
-
-      #指定タグが付いたスクショを全件、最新順で取得
-      @screenshots = ScreenShot.includes(:tags)
-                               .where(tags:{id: params[:tag]})
-                               .order(created_at: :desc)
-    else
-      @screenshots = ScreenShot.order(created_at: :desc)
-    end
+    @screenshots_array = []
+    @screenshots = ScreenShot.includes(:tags).order(created_at: :desc)
+    @screenshots.each{|s|@screenshots_array << s.as_json(only:[:path],include:{tags: {only: :name}})}
     
-    #取得したスクショを、カラム指定してJSONとして配列に入れる
-    @screenshots.each {|screenshot| @tags_array << screenshot.as_json(only:[:path])}
+    # byebug
     
-    render json: {screenshots: @tags_array}
-
-   end
+    # s.as_json(only:[:path],include:{tags: {only: :name}})
+    #↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓
+    # {"path"=>"test/path1", "tags"=>[{"name"=>"test_name_1"}]}
+    
+    render json: {screenshots: @screenshots_array}
+    
+  end
 end
-
-#byebug
