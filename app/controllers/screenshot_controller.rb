@@ -9,7 +9,6 @@ class ScreenshotController < ApplicationController
     end
     render json: {screenshot_tags: @tags_array}
   end
-  #-----------------------------------------------------------#-----------------------------------------------------------
   #------------最新のscreenshot取得----------------------------#-----------------------------------------------------------
   def latest
     if params[:limit] == 0.to_s       #limit=0を1として扱う
