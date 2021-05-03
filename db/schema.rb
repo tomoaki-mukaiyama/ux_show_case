@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_27_103124) do
+ActiveRecord::Schema.define(version: 2021_05_03_083650) do
 
   create_table "platforms", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "name"
@@ -39,6 +39,8 @@ ActiveRecord::Schema.define(version: 2021_04_27_103124) do
     t.string "path"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "main_tag"
+    t.index ["main_tag"], name: "index_screen_shots_on_main_tag"
     t.index ["userflow_id"], name: "index_screen_shots_on_userflow_id"
   end
 
@@ -77,6 +79,7 @@ ActiveRecord::Schema.define(version: 2021_04_27_103124) do
   add_foreign_key "screen_shot_tags", "screen_shots"
   add_foreign_key "screen_shot_tags", "tags"
   add_foreign_key "screen_shots", "products", column: "userflow_id"
+  add_foreign_key "screen_shots", "tags", column: "main_tag"
   add_foreign_key "user_flow_tags", "tags"
   add_foreign_key "user_flow_tags", "user_flows"
   add_foreign_key "user_flows", "platforms"
