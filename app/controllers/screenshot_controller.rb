@@ -36,18 +36,21 @@ class ScreenshotController < ApplicationController
         @screenshots_array = []
         
         if params[:tag] #タグ指定あり
-          @screenshots = @screenshots.where(tags:{id:params[:tag]}) #指定タグで絞る
-          @screenshots.each do|s|
-            main_tag = s.tags.find(s.main_tag).as_json(root: "main_tag")  #hash1
-            screenshot_with_tags = s.as_json(only:[:path],include: :tags) #hash2
-            hash = main_tag.merge!(screenshot_with_tags)  #ふたつのハッシュをmerge
-            @screenshots_array << hash  #配列に入れる
+          @where_tag = @screenshots.where(tags:{id:params[:tag]}) #指定タグで絞る
+          @where_tag.each do|tag|
+          @screenshot = @screenshots.find(tag.id)
+          screenshot_with_tag = @screenshot.as_json(only:[:path],include: :tags) #hash1
+          # byebug
+          main_tag = @screenshot.tags.find_by(id: tag.main_tag).as_json(root: "main_tag") #hash2
+          hash = main_tag.merge!(screenshot_with_tag)  #ふたつのハッシュをmerge
+          @screenshots_array << hash #配列に入れる
           end
+
         else            #タグ指定なし
           @screenshots.each do|s|
             main_tag = s.tags.find(s.main_tag).as_json(root: "main_tag")  #hash1
-            screenshot_with_tags = s.as_json(only:[:path],include: :tags) #hash2
-            hash = main_tag.merge!(screenshot_with_tags)  #ふたつのハッシュをmerge
+            screenshot_with_tag = s.as_json(only:[:path],include: :tags) #hash2
+            hash = main_tag.merge!(screenshot_with_tag)  #ふたつのハッシュをmerge
             @screenshots_array << hash  #配列に入れる
           end
         end
@@ -61,4 +64,3 @@ class ScreenshotController < ApplicationController
     
   end
   
-  # byebug

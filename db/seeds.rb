@@ -13,8 +13,8 @@
 # end
 # 5.times do |n|
 #     ScreenShot.create!(
-#         product_id: n + 1,
-#         platform_id: n + 1,
+#         userflow_id: n + 1,
+#         main_tag: 3,
 #         path: "test/path#{n + 1}"
 #     )
 # end
@@ -22,7 +22,7 @@
 5.times do |n|
     ScreenShotTag.create!(
         screen_shot_id: n + 1,
-        tag_id: n + 1
+        tag_id: 3
     )
 end
 
