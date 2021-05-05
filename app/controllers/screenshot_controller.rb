@@ -26,7 +26,6 @@ class ScreenshotController < ApplicationController
     if params[:page].to_s.empty? || params[:limit].to_s.empty? #pageとlimitのリクエスト不備の場合エラーを返す
       response_bad_request  #エラーメソッド(application_controller.rb)
     else
-    # byebug
 
         #全スクショ最新順取得＆limit&page指定 => @screenshotsに代入
         @screenshots = ScreenShot.includes(:tags)
@@ -35,23 +34,31 @@ class ScreenshotController < ApplicationController
                                 .offset(page_num * page_size)
         
         @screenshots_array = []
-
+        
         if params[:tag] #タグ指定あり
-        @screenshots = @screenshots.where(tags:{id:params[:tag]}) #指定タグで絞る
+          @screenshots = @screenshots.where(tags:{id:params[:tag]}) #指定タグで絞る
           @screenshots.each do|s|
-            @screenshots_array << s.as_json(only:[:path],include:{tags: {only: :name}}) #配列に入れる
+            main_tag = s.tags.find(s.main_tag).as_json(root: "main_tag")  #hash1
+            screenshot_with_tags = s.as_json(only:[:path],include: :tags) #hash2
+            hash = main_tag.merge!(screenshot_with_tags)  #ふたつのハッシュをmerge
+            @screenshots_array << hash  #配列に入れる
           end
         else            #タグ指定なし
           @screenshots.each do|s|
-            @screenshots_array << s.as_json(only:[:path],include:{tags: {only: :name}}) #配列に入れる
+            main_tag = s.tags.find(s.main_tag).as_json(root: "main_tag")  #hash1
+            screenshot_with_tags = s.as_json(only:[:path],include: :tags) #hash2
+            hash = main_tag.merge!(screenshot_with_tags)  #ふたつのハッシュをmerge
+            @screenshots_array << hash  #配列に入れる
           end
         end
         
         render json: {screenshots: @screenshots_array} 
-
+        
+      end
     end
+    #-----------------------------------------------------------#-----------------------------------------------------------
+    
+    
   end
-  #-----------------------------------------------------------#-----------------------------------------------------------
-
-
-end
+  
+  # byebug

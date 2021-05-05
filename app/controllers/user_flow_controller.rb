@@ -63,11 +63,11 @@ class UserFlowController < ApplicationController
         if params[:tag] #タグ指定あり
           @userflows = @userflows.where(tags:{id:params[:tag]}) #指定タグで絞る
             @userflows.each do|u|
-              @userflows_array << u.as_json(except:[:id, :product_id, :platform_id,:created_at,:updated_at],include:{tags:{only:[:name,:isTop,:isRecommend]}}) #配列に入れる
+              @userflows_array << u.as_json(include: :tags) #配列に入れる
             end
         else            #タグ指定なし
           @userflows.each do|u|
-            @userflows_array << u.as_json(except:[:id, :product_id, :platform_id,:created_at,:updated_at],include:{tags:{only:[:name,:isTop,:isRecommend]}}) #配列に入れる
+            @userflows_array << u.as_json(include: :tags)#配列に入れる
           end
       
         end

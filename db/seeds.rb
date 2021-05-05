@@ -27,9 +27,9 @@
 end
 
 
-5.times do |n|
-    UserFlowTag.create!(
-        tag_id: n + 1,
-        user_flow_id: n + 1
-    )
-end
+# 5.times do |n|
+#     UserFlowTag.create!(
+#         tag_id: n + 1,
+#         user_flow_id: n + 1
+#     )
+# end
