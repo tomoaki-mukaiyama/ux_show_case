@@ -22,45 +22,50 @@ class ScreenshotController < ApplicationController
      else
       page_num  = params[:page].to_i - 1
     end
-
+    
     if params[:page].to_s.empty? || params[:limit].to_s.empty? #pageとlimitのリクエスト不備の場合エラーを返す
       response_bad_request  #エラーメソッド(application_controller.rb)
     else
-
-        #全スクショ最新順取得＆limit&page指定 => @screenshotsに代入
-        @screenshots = ScreenShot.includes(:tags)
-                                .order(created_at: :desc)
-                                .limit(page_size)
-                                .offset(page_num * page_size)
+      
+      
+      
+      @screenshots_array = []
+      if params[:tag] #タグ指定あり
         
-        @screenshots_array = []
+        @screenshots = ScreenShot.eager_load(:tags)
+        .where(tags: {id: params[:tag]})     #タグ絞り込み
+        .order(created_at: :desc)
+        .limit(page_size)
+        .offset(page_num * page_size)
         
-        if params[:tag] #タグ指定あり
-          @where_tag = @screenshots.where(tags:{id:params[:tag]}) #指定タグで絞る
-          @where_tag.each do|tag|
-          @screenshot = @screenshots.find(tag.id)
-          screenshot_with_tag = @screenshot.as_json(only:[:path],include: :tags) #hash1
+        @screenshots.each do|screenshot| 
+          @screenshot = ScreenShot.preload(:tags).find(screenshot.id)          #eager_load & whereで絞ったスクショは所有タグ一覧表示不可な為、再呼び出し不可避
+          screenshot_with_tag = @screenshot.as_json(only:[:path],include: :tags)          #hash1 所有タグ一覧
+          main_tag = screenshot.tags.find_by(id: screenshot.main_tag).as_json(root: "main_tag") #hash2 メインタグ
+          hash = main_tag.merge!(screenshot_with_tag)                                     #ふたつのハッシュをmerge
+          @screenshots_array << hash #できたハッシュを配列に入れる
           # byebug
-          main_tag = @screenshot.tags.find_by(id: tag.main_tag).as_json(root: "main_tag") #hash2
-          hash = main_tag.merge!(screenshot_with_tag)  #ふたつのハッシュをmerge
-          @screenshots_array << hash #配列に入れる
-          end
-
-        else            #タグ指定なし
-          @screenshots.each do|s|
-            main_tag = s.tags.find(s.main_tag).as_json(root: "main_tag")  #hash1
-            screenshot_with_tag = s.as_json(only:[:path],include: :tags) #hash2
-            hash = main_tag.merge!(screenshot_with_tag)  #ふたつのハッシュをmerge
-            @screenshots_array << hash  #配列に入れる
-          end
         end
         
-        render json: {screenshots: @screenshots_array} 
-        
+      else            #タグ指定なし
+        @screenshots = ScreenShot.preload(:tags)
+        .order(created_at: :desc)
+        .limit(page_size)
+        .offset(page_num * page_size)
+
+        @screenshots.each do|screenshot|
+          main_tag = screenshot.tags.find(screenshot.main_tag).as_json(root: "main_tag")  #hash1
+          screenshot_with_tag = screenshot.as_json(only:[:path],include: :tags) #hash2
+          hash = main_tag.merge!(screenshot_with_tag)  #ふたつのハッシュをmerge
+          @screenshots_array << hash  #配列に入れる
+        end
       end
+      
+      render json: {screenshots: @screenshots_array} 
+      
     end
-    #-----------------------------------------------------------#-----------------------------------------------------------
-    
-    
   end
+  #-----------------------------------------------------------#-----------------------------------------------------------
   
+  
+end
