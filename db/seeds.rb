@@ -1,16 +1,17 @@
 
 
-# 5.times do |n|
-#     UserFlow.create!(
-#         product_id: n + 1,
-#         platform_id: n + 1,
-#         bg_color: "test_color#{n + 1}",
-#         icon_path: "test_icon_path#{n + 1}",
-#         version: "test_v1",
-#         video_time_string: "1:00",
-#         video_path: "test_video_path#{n + 1}"
-#     )
-# end
+9.times do |n|
+    UserFlow.create!(
+        product_id: (1..5).to_a.sample,
+        platform_id: (1..5).to_a.sample,
+        bg_color: "test_color#{n + 1}",
+        icon_path: "test_icon_path#{n + 1}",
+        version: "test_v1",
+        video_time_string: "1:00",
+        video_path: "test_video_path#{n + 1}"
+    )
+end
+
 # 5.times do |n|
 #     ScreenShot.create!(
 #         userflow_id: n + 1,
@@ -27,9 +28,9 @@
 # end
 
 
-5.times do |n|
-    UserFlowTag.create!(
-        tag_id: [4,5,6].sample,
-        user_flow_id: n + 1
-    )
-end
+# 5.times do |n|
+#     UserFlowTag.create!(
+#         tag_id: [4,5,6].sample,
+#         user_flow_id: n + 1
+#     )
+# end

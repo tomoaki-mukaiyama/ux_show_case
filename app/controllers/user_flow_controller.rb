@@ -89,7 +89,23 @@ class UserFlowController < ApplicationController
   end
   
   #------------動画詳細ページ取得----------------------------#-----------------------------------------------------------
-  # /userflow/[product]/[platform]/[flowtag] userflow動画の詳細ページ
+  # /userflow/[product]/[platform]/[flowtag] userflow動画の詳細ページ 最新の１件
+  
+  def detail
+    @userflows_array = []
+    target_flow = UserFlow
+    .eager_load(:tags)
+    .where(product_id:params[:product_id],platform_id:params[:platform_id],tags: {id: params[:flowtag_id]})
+    .order(created_at: :desc)
+    .first
+    
+    flow = UserFlow.preload(:tags, :product, :platform).find(target_flow.id).as_json(include:[{product:{only:[:name, :description]}},{platform:{only:[:name]}},:tags]) #.as_json(include: {product:{only:[:name, :description]}} )
+    # byebug
+
+    @userflows_array << flow
+    render json: {userflow: @userflows_array}
+    
+  end
   
   #------------動画詳細ページのスクショ一覧取得----------------#-----------------------------------------------------------
   # /userflow/[product]/[platform]/[flowtag]/screen_shot userflow動画の詳細ページのスクショ一覧
