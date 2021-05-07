@@ -19,17 +19,17 @@
 #     )
 # end
 
-5.times do |n|
-    ScreenShotTag.create!(
-        screen_shot_id: n + 1,
-        tag_id: 3
-    )
-end
-
-
 # 5.times do |n|
-#     UserFlowTag.create!(
-#         tag_id: n + 1,
-#         user_flow_id: n + 1
+#     ScreenShotTag.create!(
+#         screen_shot_id: n + 1,
+#         tag_id: 3
 #     )
 # end
+
+
+5.times do |n|
+    UserFlowTag.create!(
+        tag_id: [4,5,6].sample,
+        user_flow_id: n + 1
+    )
+end

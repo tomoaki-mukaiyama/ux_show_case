@@ -54,20 +54,30 @@ class UserFlowController < ApplicationController
     else
 
           #全動画を最新順取得＆limit&page指定 => @userflowsに代入
-          @userflows = UserFlow.includes(:tags)
-                              .order(created_at: :desc)
-                              .limit(page_size)
-                              .offset(page_num * page_size)
+          
       
         @userflows_array = []
-        if params[:tag] #タグ指定あり
-          @userflows = @userflows.where(tags:{id:params[:tag]}) #指定タグで絞る
-            @userflows.each do|u|
-              @userflows_array << u.as_json(include: :tags) #配列に入れる
+        if params[:tag] #タグ指定ありーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+        
+        @userflows = UserFlow.eager_load(:tags)   #タグ絞り込み　＆　全件取得
+        .where(tags: {id: params[:tag]})
+        .order(created_at: :desc)
+        .limit(page_size)
+        .offset(page_num * page_size)
+
+            @userflows.each do|userflow|
+              hash = UserFlow.preload(:tags).find(userflow.id).as_json(include: :tags)     #hash1 所有タグ一覧 
+              @userflows_array << hash #ハッシュを配列に入れる
             end
-        else            #タグ指定なし
-          @userflows.each do|u|
-            @userflows_array << u.as_json(include: :tags)#配列に入れる
+        else            #タグ指定なしーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+          @userflows = UserFlow.preload(:tags)
+          .order(created_at: :desc)
+          .limit(page_size)
+          .offset(page_num * page_size)
+
+          @userflows.each do|userflow|
+            hash = userflow.as_json(include: :tags)
+            @userflows_array << hash #ハッシュを配列に入れる
           end
       
         end
