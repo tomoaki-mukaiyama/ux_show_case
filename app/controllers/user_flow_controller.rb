@@ -77,7 +77,7 @@ class UserFlowController < ApplicationController
         @userflows = UserFlow.preload(:tags)
         .order(created_at: :desc)
         .limit(page_size)
-        .offset(page_num * page_size)
+        .offset(page_num * page_size) 
         
         @userflows.each do|userflow|
           hash = userflow.as_json(include: :tags)
@@ -138,7 +138,8 @@ class UserFlowController < ApplicationController
   # /userflow/[product]/ プロダクトの他の動画一覧
   def product_userflow
     # byebug
-    @product_userflow = UserFlow.where(product_id: params[:product_id]).as_json
+    # @product_userflow = UserFlow.where(product_id: params[:product_id]).as_json
+    @product_userflow = UserFlow.preload(:product, :platform).where(product_id: params[:product_id]).as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
     render json: {userflow: @product_userflow}
     
   end

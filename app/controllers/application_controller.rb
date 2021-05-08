@@ -5,9 +5,8 @@ class ApplicationController < ActionController::API
                                   message: 'Bad Request', 
                                   invalid_params: [
                                                     { 
-                                                      reason: "page & limit must both exist and must be a '0 =< int' ",
-                                                      example: "?page=2&limit=2",
-                                                      note: "0 will be used as 1"
+                                                      example1: "userflow?page=2&limit=2",
+                                                      example2: "/userflow/1"
                                                     }
                                                   ]
                                 }
