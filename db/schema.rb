@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_03_083650) do
+ActiveRecord::Schema.define(version: 2021_05_08_095325) do
 
   create_table "platforms", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "name"
@@ -35,13 +35,13 @@ ActiveRecord::Schema.define(version: 2021_05_03_083650) do
   end
 
   create_table "screen_shots", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.bigint "userflow_id", null: false
+    t.bigint "user_flow_id", null: false
     t.string "path"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "main_tag"
     t.index ["main_tag"], name: "index_screen_shots_on_main_tag"
-    t.index ["userflow_id"], name: "index_screen_shots_on_userflow_id"
+    t.index ["user_flow_id"], name: "index_screen_shots_on_user_flow_id"
   end
 
   create_table "tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
@@ -78,7 +78,7 @@ ActiveRecord::Schema.define(version: 2021_05_03_083650) do
 
   add_foreign_key "screen_shot_tags", "screen_shots"
   add_foreign_key "screen_shot_tags", "tags"
-  add_foreign_key "screen_shots", "products", column: "userflow_id"
+  add_foreign_key "screen_shots", "products", column: "user_flow_id"
   add_foreign_key "screen_shots", "tags", column: "main_tag"
   add_foreign_key "user_flow_tags", "tags"
   add_foreign_key "user_flow_tags", "user_flows"

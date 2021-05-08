@@ -100,7 +100,6 @@ class UserFlowController < ApplicationController
   # /userflow/[product]/[platform]/[flowtag] userflow動画の詳細ページ 最新の１件
   
   def detail
-    @userflows_array = []
     target_flow = UserFlow
     .eager_load(:tags)
     .where(product_id:params[:product_id],platform_id:params[:platform_id],tags: {id: params[:flowtag_id]})
@@ -114,13 +113,34 @@ class UserFlowController < ApplicationController
       render json: {userflow: flow}
       
     end
-    # byebug
   end
   
-  #------------動画詳細ページのスクショ一覧取得----------------#-----------------------------------------------------------
-  # /userflow/[product]/[platform]/[flowtag]/screen_shot userflow動画の詳細ページのスクショ一覧
-  
+  #------------動画のスクショ一覧取得----------------#-----------------------------------------------------------
+  # /userflow/[product]/[platform]/[flowtag]/screen_shot 
+  def screenshot
+    @screenshots_array = []
+    target_flow = UserFlow
+    .eager_load(:tags)
+    .where(product_id:params[:product_id],platform_id:params[:platform_id],tags: {id: params[:flowtag_id]})
+    .order(created_at: :desc)
+    .first
+    if target_flow == nil #データが無ければ404notfoundを返す
+      response_not_found #application.rb
+    else
+      flow_with_shots = UserFlow.preload(:screen_shots).find(target_flow.id).as_json(include: :screen_shots)
+      
+      render json: {userflow: flow_with_shots}
+      
+    end
+    
+  end
   #------------当該プロダクトの他の動画取得-------------------#-----------------------------------------------------------
   # /userflow/[product]/ プロダクトの他の動画一覧
+  def product_userflow
+    # byebug
+    @product_userflow = UserFlow.where(product_id: params[:product_id]).as_json
+    render json: {userflow: @product_userflow}
+    
+  end
   #-----------------------------------------------------------#-----------------------------------------------------------
 end
