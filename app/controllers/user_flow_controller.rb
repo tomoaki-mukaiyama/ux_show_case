@@ -67,8 +67,13 @@ class UserFlowController < ApplicationController
 
             @userflows.each do|userflow|
               hash = UserFlow.preload(:tags).find(userflow.id).as_json(include: :tags)     #hash1 所有タグ一覧 
-              @userflows_array << hash #ハッシュを配列に入れる
+              if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
+                @userflows_array << hash
+              else
+                @userflows_array = hash #無い場合、そのままレンダー
+              end
             end
+            # byebug
         else            #タグ指定なしーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
           @userflows = UserFlow.preload(:tags)
           .order(created_at: :desc)
@@ -77,7 +82,11 @@ class UserFlowController < ApplicationController
 
           @userflows.each do|userflow|
             hash = userflow.as_json(include: :tags)
-            @userflows_array << hash #ハッシュを配列に入れる
+            if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
+              @userflows_array << hash
+            else
+              @userflows_array = hash #無い場合、そのままレンダー
+            end
           end
       
         end
@@ -99,11 +108,9 @@ class UserFlowController < ApplicationController
     .order(created_at: :desc)
     .first
     
-    flow = UserFlow.preload(:tags, :product, :platform).find(target_flow.id).as_json(include:[{product:{only:[:name, :description]}},{platform:{only:[:name]}},:tags]) #.as_json(include: {product:{only:[:name, :description]}} )
-    # byebug
+    flow = UserFlow.preload(:tags, :product, :platform).find(target_flow.id).as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags]) #.as_json(include: {product:{only:[:name, :description]}} )
 
-    @userflows_array << flow
-    render json: {userflow: @userflows_array}
+    render json: {userflow: flow}
     
   end
   
