@@ -72,8 +72,8 @@ class UserFlowController < ApplicationController
           
           # byebug
           if userflow.tags.count == 1
-            user@tags = userflow.tags.as_json(root: "tags").first
-            hash = userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]).merge!(user@tags)
+            @tags = userflow.tags.as_json(root: "tags").first
+            hash = userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]).merge!(@tags)
           end
           
 
@@ -93,8 +93,8 @@ class UserFlowController < ApplicationController
           if userflow.tags.count != 1
             hash = userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags])
           else
-            user@tags = userflow.tags.as_json(root: "tags").first
-            hash = {userflow: userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]).merge!(user@tags)}
+            @tags = userflow.tags.as_json(root: "tags").first
+            hash = {userflow: userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]).merge!(@tags)}
           end
 
           if @userflows.count != 1 #userflowが複数ある場合、配列に入れる

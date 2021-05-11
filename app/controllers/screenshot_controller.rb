@@ -40,16 +40,16 @@ class ScreenshotController < ApplicationController
         .offset(page_num * page_size)
         
         @screenshots.each do|screenshot|
-          screenshot_preload_tags = ScreenShot
+          tags_loaded_screenshot = ScreenShot
           .preload(:tags)
           .find_by(id: screenshot.id)     #hash1 所有タグ一覧
           
-          main_tag = screenshot_preload_tags.tags.find_by(id: screenshot.main_tag).as_json(root: "main_tag") 
+          main_tag = tags_loaded_screenshot.tags.find_by(id: screenshot.main_tag).as_json(root: "main_tag") 
           screenshot_with_main_tag = screenshot.as_json(root:"screenshot").merge!(main_tag.as_json)      #hash merge
           
           
-          all_tags = screenshot_preload_tags.tags.as_json #hash2
-          all_tags = screenshot_preload_tags.tags.first if screenshot_preload_tags.tags.count == 1 #一つしか無いなら.firstで取り出して配列解除
+          all_tags = tags_loaded_screenshot.tags.as_json #hash2
+          all_tags = tags_loaded_screenshot.tags.first if tags_loaded_screenshot.tags.count == 1 #一つしか無いなら.firstで取り出して配列解除
           tags_hash = {tags: all_tags}
           hash = screenshot_with_main_tag.merge!(tags_hash)
           # byebug
