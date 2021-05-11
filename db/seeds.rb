@@ -60,11 +60,11 @@ ScreenShotTag.all.each {|n|n.update!(tag_id: tag_id[n.id - 1])}
 num = -2
 count = ScreenShotTag.all.count / 2
 count.times do|n|
-    byebug
-    ScreenShotTag.all[num = num + 2].update!(screen_shot_id:n)
+    # byebug
+    ScreenShotTag.all[num = num + 2].update!(screen_shot_id:n + 1)
 end
 num = -1
-count.times {|n|ScreenShotTag.all[num = num + 2].update!(screen_shot_id:n)}
+count.times {|n|ScreenShotTag.all[num = num + 2].update!(screen_shot_id:n + 1)}
 
 
 
@@ -78,3 +78,5 @@ count.times {|n|ScreenShotTag.all[num = num + 2].update!(screen_shot_id:n)}
         user_flow_id: n + 1
     )
 end
+tag_id = [1,1,2,2,1,1,2,2]
+UserFlowTag.all.each{|n|n.update!(tag_id: tag_id[n += 1])}
