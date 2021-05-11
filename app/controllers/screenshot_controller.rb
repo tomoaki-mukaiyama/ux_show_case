@@ -49,8 +49,10 @@ class ScreenshotController < ApplicationController
           
           
           all_tags = screenshot_preload_tags.tags.as_json #hash2
+          all_tags = screenshot_preload_tags.tags.first if screenshot_preload_tags.tags.count == 1 #一つしか無いなら.firstで取り出して配列解除
           tags_hash = {tags: all_tags}
           hash = screenshot_with_main_tag.merge!(tags_hash)
+          # byebug
           
           if @screenshots.count != 1 #screenshotが複数ある場合、配列に入れる
             @screenshots_array << hash
@@ -70,11 +72,12 @@ class ScreenshotController < ApplicationController
           userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}],root:"userflow")
           screenshot_with_userflow = screenshot.as_json(root:"screenshot").merge!(userflow)
           screenshot_with_userflow_and_main_tag = screenshot_with_userflow.as_json.merge!(main_tag.as_json)  #hash1
-          # byebug
           
-          tags = screenshot.tags.as_json #hash2
-          tags_hash = {tags: tags}
+          all_tags = screenshot.tags.as_json #hash2
+          all_tags = screenshot.tags.first if screenshot.tags.count == 1 #一つしか無いなら.firstで取り出して配列解除
+          tags_hash = {tags: all_tags}
           hash = screenshot_with_userflow_and_main_tag.merge!(tags_hash)  #ふたつのハッシュをmerge
+          # byebug
           
           if @screenshots.count != 1 #screenshotが複数ある場合、配列に入れる
             @screenshots_array << hash

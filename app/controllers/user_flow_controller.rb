@@ -67,12 +67,20 @@ class UserFlowController < ApplicationController
         @userflows.each do|userflow|
           hash = UserFlow
           .preload(:tags, :product, :platform)
-          .find(userflow.id)
-          .as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags])     #hash1 所有タグ一覧 
+          .find_by(id: userflow.id)
+          .as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags])     #hash1 所有タグ一覧
+          
+          # byebug
+          if userflow.tags.count == 1
+            user@tags = userflow.tags.as_json(root: "tags").first
+            hash = userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]).merge!(user@tags)
+          end
+          
+
           if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
-            @userflows_array << hash
+            @userflows_array << {userflow: hash}
           else
-            @userflows_array = hash #一つの場合一つだけ出力
+            @userflows_array = {userflow: hash} #一つの場合一つだけ出力
           end
         end
       else            #ーーーーーータグ指定なしーーーーーーー
@@ -82,8 +90,13 @@ class UserFlowController < ApplicationController
         .offset(page_num * page_size) 
         
         @userflows.each do|userflow|
-          # byebug
-          hash = userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags])
+          if userflow.tags.count != 1
+            hash = userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags])
+          else
+            user@tags = userflow.tags.as_json(root: "tags").first
+            hash = {userflow: userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]).merge!(user@tags)}
+          end
+
           if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
             @userflows_array << hash
           else
@@ -113,9 +126,14 @@ class UserFlowController < ApplicationController
     else
       flow = UserFlow
       .preload(:tags, :product, :platform)
-      .find(target_flow.id)
+      .find_by(id: target_flow.id)
       .as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags]) 
       
+      # @tags = flow.tags.as_json
+      # @tags = flow.tags.first if flow.tags.count == 1 #一つしか無いなら.firstで取り出して配列解除
+      # tags_hash = {tags: @tags}
+      # flow = flow.as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
+      # flow = flow.merge!(tags_hash)
       render json: {userflow: flow}
       
     end
@@ -133,14 +151,15 @@ class UserFlowController < ApplicationController
     if target_flow == nil #データが無ければ404notfoundを返す
       response_not_found #application.rb
     else
-      flow_with_shots = UserFlow
+      flow = UserFlow
       .preload(:screen_shots, :product, :platform)
-      .find(target_flow.id)
+      .find_by(id: target_flow.id)
       .as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},{ screen_shots: {include: :tags}}])
-
       
       # byebug
-      render json: {userflow: flow_with_shots}
+
+
+      render json: {userflow: flow}
       
     end
     
