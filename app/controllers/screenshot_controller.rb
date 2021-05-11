@@ -5,7 +5,7 @@ class ScreenshotController < ApplicationController
     @screenshot_tags = Tag.where(tag_type: 0)
     @tags_array = []
     @screenshot_tags.each do |screenshot_tag|
-      @tags_array << screenshot_tag.as_json(only:[:name])
+      @tags_array << screenshot_tag.as_json #(only:[:name])
     end
     render json: {screenshot_tags: @tags_array}
   end
@@ -31,44 +31,58 @@ class ScreenshotController < ApplicationController
       
       
       @screenshots_array = []
-      if params[:tag] #タグ指定ありーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+      if params[:tag] #ーーーーーータグ指定ありーーーーーーー
         
-        @screenshots = ScreenShot.eager_load(:tags)   #タグ絞り込み　＆　全件取得
+        @screenshots = ScreenShot.eager_load(:tags)   #タグ絞り込み　＆　全件取得　このidとmain_tagを下で使う
         .where(tags: {id: params[:tag]})
         .order(created_at: :desc)
         .limit(page_size)
         .offset(page_num * page_size)
         
-        @screenshots.each do|screenshot| 
-          screenshot_with_tag = ScreenShot.preload(:tags).find(screenshot.id).as_json(only:[:path],include: :tags)     #hash1 所有タグ一覧    #eager_load & whereで絞ったスクショは所有タグ一覧の取得が不可な為、再呼び出し不可避
-          main_tag = screenshot.tags.find_by(id: screenshot.main_tag).as_json(root: "main_tag") #hash2 メインタグ
-          hash = main_tag.merge!(screenshot_with_tag)      #ふたつのハッシュをmerge
+        @screenshots.each do|screenshot|
+          screenshot_preload_tags = ScreenShot
+          .preload(:tags)
+          .find_by(id: screenshot.id)     #hash1 所有タグ一覧
+          
+          main_tag = screenshot_preload_tags.tags.find_by(id: screenshot.main_tag).as_json(root: "main_tag") 
+          screenshot_with_main_tag = screenshot.as_json(root:"screenshot").merge!(main_tag.as_json)      #hash merge
+          
+          
+          all_tags = screenshot_preload_tags.tags.as_json #hash2
+          tags_hash = {tags: all_tags}
+          hash = screenshot_with_main_tag.merge!(tags_hash)
           
           if @screenshots.count != 1 #screenshotが複数ある場合、配列に入れる
             @screenshots_array << hash
           else
-            @screenshots_array = hash #無い場合、そのままレンダー
+            @screenshots_array = hash #一つの場合一つだけ出力
           end
         end
         
-      else            #タグ指定なしーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
-        @screenshots = ScreenShot.preload(:tags)     #全件取得
+      else            #ーーーーーータグ指定なしーーーーーーー
+        @screenshots = ScreenShot.preload(:tags,:user_flow)     #全件取得
         .order(created_at: :desc)
         .limit(page_size)
         .offset(page_num * page_size)
         
         @screenshots.each do|screenshot|
-          main_tag = screenshot.tags.find(screenshot.main_tag).as_json(root: "main_tag")  #hash1
-          screenshot_with_tag = screenshot.as_json(only:[:path],include: :tags) #hash2
-          hash = main_tag.merge!(screenshot_with_tag)  #ふたつのハッシュをmerge
+          main_tag = screenshot.tags.find_by(id: screenshot.main_tag).as_json(root: "main_tag")
+          userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}],root:"userflow")
+          screenshot_with_userflow = screenshot.as_json(root:"screenshot").merge!(userflow)
+          screenshot_with_userflow_and_main_tag = screenshot_with_userflow.as_json.merge!(main_tag.as_json)  #hash1
+          # byebug
+          
+          tags = screenshot.tags.as_json #hash2
+          tags_hash = {tags: tags}
+          hash = screenshot_with_userflow_and_main_tag.merge!(tags_hash)  #ふたつのハッシュをmerge
           
           if @screenshots.count != 1 #screenshotが複数ある場合、配列に入れる
             @screenshots_array << hash
           else
-            @screenshots_array = hash #無い場合、そのままレンダー
+            @screenshots_array = hash #一つの場合一つだけ出力
           end
         end
-      end             #ーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+      end
       
       render json: {screenshots: @screenshots_array} 
       
@@ -78,5 +92,3 @@ class ScreenshotController < ApplicationController
   
   
 end
-
-# byebug

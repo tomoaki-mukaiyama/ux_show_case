@@ -5,11 +5,11 @@ class UserFlowController < ApplicationController
   #------------useflowのタグ一覧取得--------------------------#-----------------------------------------------------------
   
   def tag_index
-    #tag_typeの値が1のやつ(UserFlowのタグ)を全取得、json形式で配列に入れる
+    #tag_typeの値が1のやつ(UserFlowのタグ)を全取得
     @tags = Tag.where(tag_type: 1)
     @tags_array = []
     @tags.each do |tag|
-      @tags_array << tag.as_json(only:[:name])
+      @tags_array << tag.as_json 
     end
     render json: { tags: @tags_array }
   end
@@ -19,7 +19,7 @@ class UserFlowController < ApplicationController
     @tags = Tag.where(isTop: 1)
     @tags_array = []
     @tags.each do |tag|
-      @tags_array << tag.as_json(only:[:name])
+      @tags_array << tag.as_json  
     end
     render json: { tags: @tags_array }
   end
@@ -29,7 +29,7 @@ class UserFlowController < ApplicationController
     @tags = Tag.where(isRecommend: 1)
     @tags_array = []
     @tags.each do |tag|
-      @tags_array << tag.as_json(only:[:name])
+      @tags_array << tag.as_json
     end
     render json: { tags: @tags_array }
   end
@@ -56,7 +56,7 @@ class UserFlowController < ApplicationController
       
       
       @userflows_array = []
-      if params[:tag] #タグ指定ありーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
+      if params[:tag] #ーーーーーータグ指定ありーーーーーーー
         
         @userflows = UserFlow.eager_load(:tags)   #タグ絞り込み　＆　全件取得
         .where(tags: {id: params[:tag]})
@@ -65,26 +65,29 @@ class UserFlowController < ApplicationController
         .offset(page_num * page_size)
         
         @userflows.each do|userflow|
-          hash = UserFlow.preload(:tags).find(userflow.id).as_json(include: :tags)     #hash1 所有タグ一覧 
+          hash = UserFlow
+          .preload(:tags, :product, :platform)
+          .find(userflow.id)
+          .as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags])     #hash1 所有タグ一覧 
           if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
             @userflows_array << hash
           else
-            @userflows_array = hash #無い場合、そのままレンダー
+            @userflows_array = hash #一つの場合一つだけ出力
           end
         end
-        # byebug
-      else            #タグ指定なしーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーーー
-        @userflows = UserFlow.preload(:tags)
+      else            #ーーーーーータグ指定なしーーーーーーー
+        @userflows = UserFlow.preload(:tags, :product, :platform)
         .order(created_at: :desc)
         .limit(page_size)
         .offset(page_num * page_size) 
         
         @userflows.each do|userflow|
-          hash = userflow.as_json(include: :tags)
+          # byebug
+          hash = userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags])
           if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
             @userflows_array << hash
           else
-            @userflows_array = hash #無い場合、そのままレンダー
+            @userflows_array = hash #一つの場合一つだけ出力
           end
         end
         
@@ -108,7 +111,10 @@ class UserFlowController < ApplicationController
     if target_flow == nil #データが無ければ404notfoundを返す
       response_not_found #application.rb
     else
-      flow = UserFlow.preload(:tags, :product, :platform).find(target_flow.id).as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags]) #.as_json(include: {product:{only:[:name, :description]}} )
+      flow = UserFlow
+      .preload(:tags, :product, :platform)
+      .find(target_flow.id)
+      .as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags]) 
       
       render json: {userflow: flow}
       
@@ -127,8 +133,13 @@ class UserFlowController < ApplicationController
     if target_flow == nil #データが無ければ404notfoundを返す
       response_not_found #application.rb
     else
-      flow_with_shots = UserFlow.preload(:screen_shots).find(target_flow.id).as_json(include: :screen_shots)
+      flow_with_shots = UserFlow
+      .preload(:screen_shots, :product, :platform)
+      .find(target_flow.id)
+      .as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},{ screen_shots: {include: :tags}}])
+
       
+      # byebug
       render json: {userflow: flow_with_shots}
       
     end
@@ -137,9 +148,11 @@ class UserFlowController < ApplicationController
   #------------当該プロダクトの他の動画取得-------------------#-----------------------------------------------------------
   # /userflow/[product]/ プロダクトの他の動画一覧
   def product_userflow
-    # byebug
-    # @product_userflow = UserFlow.where(product_id: params[:product_id]).as_json
-    @product_userflow = UserFlow.preload(:product, :platform).where(product_id: params[:product_id]).as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
+    @product_userflow = UserFlow
+    .preload(:product, :platform)
+    .where(product_id: params[:product_id])
+    .as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
+
     render json: {userflow: @product_userflow}
     
   end

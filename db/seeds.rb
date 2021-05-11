@@ -1,36 +1,80 @@
 
+Product.create!(name:"youtube",description:"動画サイト")
+Product.create!(name:"twitter",description:"SNS")
 
-9.times do |n|
+Platform.create!(name:"ios")
+Platform.create!(name:"android")
+8.times do |n|
     UserFlow.create!(
-        product_id: (1..5).to_a.sample,
-        platform_id: (1..5).to_a.sample,
-        bg_color: "test_color#{n + 1}",
-        icon_path: "test_icon_path#{n + 1}",
-        version: "test_v1",
+        product_id: 1,
+        platform_id: 1,
+        bg_color: "red",
+        icon_path: "path",
+        version: "v#{n+1}",
         video_time_string: "1:00",
-        video_path: "test_video_path#{n + 1}"
+        video_path: "path"
     )
 end
+product_id = [1,1,1,1,2,2,2,2]
+platform_id = [1,1,2,2,1,1,2,2]
 
-# 5.times do |n|
-#     ScreenShot.create!(
-#         userflow_id: n + 1,
-#         main_tag: 3,
-#         path: "test/path#{n + 1}"
-#     )
-# end
-
-# 5.times do |n|
-#     ScreenShotTag.create!(
-#         screen_shot_id: n + 1,
-#         tag_id: 3
-#     )
-# end
+n = -1
+UserFlow.all.each{|u|u.update!(product_id: product_id[n += 1])}
+n = -1
+UserFlow.all.each{|u|u.update!(platform_id: platform_id[n += 1])}
 
 
-# 5.times do |n|
-#     UserFlowTag.create!(
-#         tag_id: [4,5,6].sample,
-#         user_flow_id: n + 1
-#     )
-# end
+6.times do |n|
+    Tag.create!(
+        tag_type:1,
+        isTop: rand(2),
+        isRecommend: rand(2),
+        name:"tag_name"
+    )
+end
+Tag.all[0].update!(tag_type:0)
+Tag.all[1].update!(tag_type:0)
+
+
+
+UserFlow.all.each {|n|n.screen_shots.create!(user_flow_id:n.id)}
+main_tag=[3,4,5,6,3,4,5,6]
+2.times do |n|
+    ScreenShot.all.each do |ss|
+        ss.update!(main_tag: main_tag[ss.id - 1])
+    end
+end
+
+2.times do
+    8.times do |n|
+        ScreenShotTag.create!(
+            tag_id:1,
+            screen_shot_id: n + 1
+        )
+    end
+end
+
+tag_id = [3,5,4,6,4,5,3,6,3,4,5,4,5,4,6,3]
+ScreenShotTag.all.each {|n|n.update!(tag_id: tag_id[n.id - 1])}
+
+num = -2
+count = ScreenShotTag.all.count / 2
+count.times do|n|
+    byebug
+    ScreenShotTag.all[num = num + 2].update!(screen_shot_id:n)
+end
+num = -1
+count.times {|n|ScreenShotTag.all[num = num + 2].update!(screen_shot_id:n)}
+
+
+
+
+
+
+
+8.times do |n|
+    UserFlowTag.create!(
+        tag_id: 1,
+        user_flow_id: n + 1
+    )
+end
