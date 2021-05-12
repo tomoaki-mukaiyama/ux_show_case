@@ -139,17 +139,19 @@ class UserFlowController < ApplicationController
       .preload(:screen_shots, :product, :platform)
       .find_by(id: @target_userflow.id)
 
-      flow_product_platform = @userflow.as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]) #,screen_shots:{include: :tags}
+      @userflow_product_platform = @userflow.as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]) #,screen_shots:{include: :tags}
+      
       @screenshots = @userflow.screen_shots.as_json(include: :tags)
       main_tag = []
       @userflow.screen_shots.each {|n|main_tag << n.tags.find_by(id: n.main_tag)}
-      @screenshots_with_main_tag = []
+      @screenshots_with_tags = []
       @screenshots.each do|shots|
-        @screenshots_with_main_tag << shots.merge(main_tag[@screenshots_with_main_tag.count].as_json(root:"main_tag"))
+        @screenshots_with_tags << shots.merge(main_tag[@screenshots_with_tags.count].as_json(root:"main_tag"))
       end 
+      screenshots_hash = {screenshots: @screenshots_with_tags}
       # byebug
-      
-      render json: {userflow:flow_product_platform,screenshots:@screenshots_with_main_tag}
+      @userflow_product_platform = @userflow_product_platform.merge(screenshots_hash)
+      render json: {userflow:@userflow_product_platform}
       
     end
     

@@ -89,6 +89,7 @@ class ScreenshotController < ApplicationController
       end
       
       render json: {screenshots: @screenshots_array} 
+      # render json: {screenshots: @screenshots_with_tags,userflow:@userflow_product_platform}
       
     end
   end
