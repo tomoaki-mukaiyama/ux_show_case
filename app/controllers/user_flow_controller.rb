@@ -6,10 +6,14 @@ class UserFlowController < ApplicationController
   
   def tag_index
     #tag_typeの値が1のやつ(UserFlowのタグ)を全取得
-    @tags = Tag.where(tag_type: 1)
+    @tags = Tag.where(tag_type: 0)
     @tags_array = []
     @tags.each do |tag|
-      @tags_array << tag.as_json 
+      if @tags.count != 1
+        @tags_array << tag.as_json
+      else
+        @tags_array = @tags.first
+      end
     end
     render json: { tags: @tags_array }
   end
@@ -19,7 +23,11 @@ class UserFlowController < ApplicationController
     @tags = Tag.where(isTop: 1)
     @tags_array = []
     @tags.each do |tag|
-      @tags_array << tag.as_json  
+      if @tags.count != 1
+        @tags_array << tag.as_json
+      else
+        @tags_array = @tags.first
+      end  
     end
     render json: { tags: @tags_array }
   end
@@ -29,7 +37,11 @@ class UserFlowController < ApplicationController
     @tags = Tag.where(isRecommend: 1)
     @tags_array = []
     @tags.each do |tag|
-      @tags_array << tag.as_json
+      if @tags.count != 1
+        @tags_array << tag.as_json
+      else
+        @tags_array = @tags.first
+      end
     end
     render json: { tags: @tags_array }
   end
