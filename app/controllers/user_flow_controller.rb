@@ -105,17 +105,17 @@ class UserFlowController < ApplicationController
   # /userflow/[product]/[platform]/[flowtag] userflow動画の詳細ページ 最新の１件
   
   def detail
-    target_flow = UserFlow
+    @target_userflow = UserFlow
     .eager_load(:tags)
     .where(product_id:params[:product_id],platform_id:params[:platform_id],tags: {id: params[:flowtag_id]})
     .order(created_at: :desc)
     .first
-    if target_flow == nil #データが無ければ404notfoundを返す
+    if @target_userflow == nil #データが無ければ404notfoundを返す
       response_not_found #application.rb
     else
       flow = UserFlow
       .preload(:tags, :product, :platform)
-      .find_by(id: target_flow.id)
+      .find_by(id: @target_userflow.id)
       .as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags]) 
       
       render json: {userflow: flow}
@@ -126,24 +126,30 @@ class UserFlowController < ApplicationController
   #------------動画のスクショ一覧取得----------------#-----------------------------------------------------------
   # /userflow/[product]/[platform]/[flowtag]/screen_shot 
   def screenshot
-    @screenshots_array = []
-    target_flow = UserFlow
+    @target_userflow = UserFlow
     .eager_load(:tags)
     .where(product_id:params[:product_id],platform_id:params[:platform_id],tags: {id: params[:flowtag_id]})
     .order(created_at: :desc)
     .first
-    if target_flow == nil #データが無ければ404notfoundを返す
+
+    if @target_userflow == nil #データが無ければ404notfoundを返す
       response_not_found #application.rb
     else
-      flow = UserFlow
+      @userflow = UserFlow
       .preload(:screen_shots, :product, :platform)
-      .find_by(id: target_flow.id)
-      .as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},{ screen_shots: {include: :tags}}])
-      
+      .find_by(id: @target_userflow.id)
+
+      flow_product_platform = @userflow.as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]) #,screen_shots:{include: :tags}
+      @screenshots = @userflow.screen_shots.as_json(include: :tags)
+      main_tag = []
+      @userflow.screen_shots.each {|n|main_tag << n.tags.find_by(id: n.main_tag)}
+      @screenshots_with_main_tag = []
+      @screenshots.each do|shots|
+        @screenshots_with_main_tag << shots.merge(main_tag[@screenshots_with_main_tag.count].as_json(root:"main_tag"))
+      end 
       # byebug
-
-
-      render json: {userflow: flow}
+      
+      render json: {userflow:flow_product_platform,screenshots:@screenshots_with_main_tag}
       
     end
     
