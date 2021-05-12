@@ -9,11 +9,7 @@ class UserFlowController < ApplicationController
     @tags = Tag.where(tag_type: 0)
     @tags_array = []
     @tags.each do |tag|
-      if @tags.count != 1
         @tags_array << tag.as_json
-      else
-        @tags_array = @tags.first
-      end
     end
     render json: { tags: @tags_array }
   end
@@ -23,11 +19,7 @@ class UserFlowController < ApplicationController
     @tags = Tag.where(isTop: 1)
     @tags_array = []
     @tags.each do |tag|
-      if @tags.count != 1
         @tags_array << tag.as_json
-      else
-        @tags_array = @tags.first
-      end  
     end
     render json: { tags: @tags_array }
   end
@@ -37,11 +29,7 @@ class UserFlowController < ApplicationController
     @tags = Tag.where(isRecommend: 1)
     @tags_array = []
     @tags.each do |tag|
-      if @tags.count != 1
         @tags_array << tag.as_json
-      else
-        @tags_array = @tags.first
-      end
     end
     render json: { tags: @tags_array }
   end
@@ -61,7 +49,7 @@ class UserFlowController < ApplicationController
     end
     
     if params[:page].to_s.empty? || params[:limit].to_s.empty? #pageとlimitのリクエスト不備の場合エラーを返す
-      response_bad_request #エラーメソッド(application_controller.rb)
+      response_bad_request #(application_controller.rb)
     else
       
       #全動画を最新順取得＆limit&page指定 => @userflowsに代入
@@ -82,32 +70,21 @@ class UserFlowController < ApplicationController
           .find_by(id: userflow.id)
           .as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags])     #hash1 所有タグ一覧
           
-          # byebug
-          if userflow.tags.count == 1
-            @tags = userflow.tags.as_json(root: "tags").first
-            hash = userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]).merge!(@tags)
-          end
-          
 
           if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
-            @userflows_array << {userflow: hash}
+            @userflows_array <<  hash
           else
-            @userflows_array = {userflow: hash} #一つの場合一つだけ出力
+            @userflows_array =  hash #一つの場合一つだけ出力
           end
         end
       else            #ーーーーーータグ指定なしーーーーーーー
         @userflows = UserFlow.preload(:tags, :product, :platform)
         .order(created_at: :desc)
         .limit(page_size)
-        .offset(page_num * page_size) 
+        .offset(page_num * page_size)
         
         @userflows.each do|userflow|
-          if userflow.tags.count != 1
             hash = userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags])
-          else
-            @tags = userflow.tags.as_json(root: "tags").first
-            hash = {userflow: userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]).merge!(@tags)}
-          end
 
           if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
             @userflows_array << hash
@@ -141,11 +118,6 @@ class UserFlowController < ApplicationController
       .find_by(id: target_flow.id)
       .as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags]) 
       
-      # @tags = flow.tags.as_json
-      # @tags = flow.tags.first if flow.tags.count == 1 #一つしか無いなら.firstで取り出して配列解除
-      # tags_hash = {tags: @tags}
-      # flow = flow.as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
-      # flow = flow.merge!(tags_hash)
       render json: {userflow: flow}
       
     end
