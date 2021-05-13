@@ -32,9 +32,11 @@ class ScreenshotController < ApplicationController
       
       @screenshots_array = []
       if params[:tag] #ーーーーーータグ指定ありーーーーーーー
+        # byebug
         
-        @screenshots = ScreenShot.eager_load(:tags)   #タグ絞り込み　＆　全件取得　このidとmain_tagを下で使う
-        .where(tags: {id: params[:tag]})
+        #タグ絞り込み　＆　全件取得　このidとmain_tagを下で使う
+        @screenshots = ScreenShot.eager_load(:tags)   
+        .where(tags: {slug: params[:tag]})
         .order(created_at: :desc)
         .limit(page_size)
         .offset(page_num * page_size)
@@ -44,7 +46,6 @@ class ScreenshotController < ApplicationController
           .preload(:tags, :user_flow)
           .find_by(id: screenshot.id)     #hash1 所有タグ一覧
           
-          # byebug
           @main_tag = tags_with_userflow.tags.find_by(id: screenshot.main_tag).as_json(root: "main_tag") 
           @userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}],root:"userflow")
           screenshot_with_userflow = screenshot.as_json.merge(@userflow)      #hash merge

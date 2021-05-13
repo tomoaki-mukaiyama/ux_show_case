@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   get "/screenshots" , to: "screenshot#latest"
   get "/userflows" , to: "user_flow#latest"
 
-  get "/userflow/:product/:platform/:flowtag_id" , to: "user_flow#detail"
-  get "/userflow/:product/:platform/:flowtag_id/screenshots" , to: "user_flow#screenshot"
+  get "/userflow/:product/:platform/:flowtag" , to: "user_flow#detail"
+  get "/userflow/:product/:platform/:flowtag/screenshots" , to: "user_flow#screenshot"
   get "/userflow/:product" , to: "user_flow#product_userflow"
 end

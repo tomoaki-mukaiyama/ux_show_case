@@ -1,11 +1,9 @@
 class UserFlowController < ApplicationController
-  # def title
-  #   render json: {title: 'uxshowcase'}
-  # end
-  #------------useflowのタグ一覧取得--------------------------#-----------------------------------------------------------
+
+  #------------tag_typeの値が1のタグ一覧--------------------------#-----------------------------------------------------------
   
   def tag_index
-    #tag_typeの値が1のやつ(UserFlowのタグ)を全取得
+    
     @tags = Tag.where(tag_type: 0)
     @tags_array = []
     @tags.each do |tag|
@@ -13,7 +11,7 @@ class UserFlowController < ApplicationController
     end
     render json: { tags: @tags_array }
   end
-  #------------useflowのタグ isTopが１のやつ一覧取得--------------------------#-----------------------------------------------------------
+  #------------isTopが１のタグ一覧--------------------------#-----------------------------------------------------------
   
   def tag_top
     @tags = Tag.where(isTop: 1)
@@ -23,7 +21,7 @@ class UserFlowController < ApplicationController
     end
     render json: { tags: @tags_array }
   end
-  #------------useflowのタグ isRecommendが１のやつ一覧取得--------------------------#-----------------------------------------------------------
+  #------------isRecommendが１のタグ一覧--------------------------#-----------------------------------------------------------
 
   def tag_recommend
     @tags = Tag.where(isRecommend: 1)
@@ -59,7 +57,7 @@ class UserFlowController < ApplicationController
       if params[:tag] #ーーーーーータグ指定ありーーーーーーー
         
         @userflows = UserFlow.eager_load(:tags)   #タグ絞り込み　＆　全件取得
-        .where(tags: {id: params[:tag]})
+        .where(tags: {slug: params[:tag]})
         .order(created_at: :desc)
         .limit(page_size)
         .offset(page_num * page_size)
@@ -105,14 +103,9 @@ class UserFlowController < ApplicationController
   # /userflow/[product]/[platform]/[flowtag] userflow動画の詳細ページ 最新の１件
   
   def detail
-    # @target_userflow = UserFlow
-    # .eager_load(:tags)
-    # .where(product_id:params[:product_id],platform_id:params[:platform_id],tags: {id: params[:flowtag_id]})
-    # .order(created_at: :desc)
-    # .first
     @target_userflow = UserFlow
     .eager_load(:tags,:product,:platform)
-    .where(products:{name: params[:product]},platforms:{name:params[:platform]},tags: {id: params[:flowtag_id]}) 
+    .where(products:{name: params[:product]},platforms:{name:params[:platform]},tags: {slug: params[:flowtag]}) 
     .order(created_at: :desc)
     .first
 
@@ -132,16 +125,11 @@ class UserFlowController < ApplicationController
   #------------動画のスクショ一覧取得----------------#-----------------------------------------------------------
   # /userflow/[product]/[platform]/[flowtag]/screen_shot 
   def screenshot
-    # @target_userflow = UserFlow
-    # .eager_load(:tags)
-    # .where(product_id:params[:product_id],platform_id:params[:platform_id],tags: {id: params[:flowtag_id]})
-    # .order(created_at: :desc)
-    # .first
-    # byebug
+
     #絞り込みでターゲットのidを取得 #eager_loadではスクショのタグを芋づる取得できない為、そのidでpreloadでfind_byする
     @target_userflow = UserFlow
     .eager_load(:tags,:product,:platform)
-    .where(products:{name: params[:product]},platforms:{name:params[:platform]},tags: {id: params[:flowtag_id]}) 
+    .where(products:{name: params[:product]},platforms:{name:params[:platform]},tags: {slug: params[:flowtag]}) 
     .order(created_at: :desc)
     .first
 
@@ -175,12 +163,6 @@ class UserFlowController < ApplicationController
     .eager_load(:product, :platform)
     .where(products: {name: params[:product]})
     .as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
-
-
-    # @product_userflow = UserFlow
-    # .preload(:product, :platform)
-    # .where(product_id: params[:product_id])
-    # .as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
 
     render json: {userflow: @product_userflow}
     
