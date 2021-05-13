@@ -105,20 +105,26 @@ class UserFlowController < ApplicationController
   # /userflow/[product]/[platform]/[flowtag] userflow動画の詳細ページ 最新の１件
   
   def detail
+    # @target_userflow = UserFlow
+    # .eager_load(:tags)
+    # .where(product_id:params[:product_id],platform_id:params[:platform_id],tags: {id: params[:flowtag_id]})
+    # .order(created_at: :desc)
+    # .first
     @target_userflow = UserFlow
-    .eager_load(:tags)
-    .where(product_id:params[:product_id],platform_id:params[:platform_id],tags: {id: params[:flowtag_id]})
+    .eager_load(:tags,:product,:platform)
+    .where(products:{name: params[:product]},platforms:{name:params[:platform]},tags: {id: params[:flowtag_id]}) 
     .order(created_at: :desc)
     .first
+
     if @target_userflow == nil #データが無ければ404notfoundを返す
       response_not_found #application.rb
     else
-      flow = UserFlow
+      @userflow_product_platform_flowtag = UserFlow
       .preload(:tags, :product, :platform)
       .find_by(id: @target_userflow.id)
       .as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags]) 
       
-      render json: {userflow: flow}
+      render json: {userflow: @userflow_product_platform_flowtag}
       
     end
   end
@@ -126,9 +132,16 @@ class UserFlowController < ApplicationController
   #------------動画のスクショ一覧取得----------------#-----------------------------------------------------------
   # /userflow/[product]/[platform]/[flowtag]/screen_shot 
   def screenshot
+    # @target_userflow = UserFlow
+    # .eager_load(:tags)
+    # .where(product_id:params[:product_id],platform_id:params[:platform_id],tags: {id: params[:flowtag_id]})
+    # .order(created_at: :desc)
+    # .first
+    # byebug
+    #絞り込みでターゲットのidを取得 #eager_loadではスクショのタグを芋づる取得できない為、そのidでpreloadでfind_byする
     @target_userflow = UserFlow
-    .eager_load(:tags)
-    .where(product_id:params[:product_id],platform_id:params[:platform_id],tags: {id: params[:flowtag_id]})
+    .eager_load(:tags,:product,:platform)
+    .where(products:{name: params[:product]},platforms:{name:params[:platform]},tags: {id: params[:flowtag_id]}) 
     .order(created_at: :desc)
     .first
 
@@ -139,7 +152,7 @@ class UserFlowController < ApplicationController
       .preload(:screen_shots, :product, :platform)
       .find_by(id: @target_userflow.id)
 
-      @userflow_product_platform = @userflow.as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]) #,screen_shots:{include: :tags}
+      @userflow_product_platform_flowtag_screenshots = @userflow.as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]) #,screen_shots:{include: :tags}
       
       @screenshots = @userflow.screen_shots.as_json(include: :tags)
       main_tag = []
@@ -149,9 +162,8 @@ class UserFlowController < ApplicationController
         @screenshots_with_tags << shots.merge(main_tag[@screenshots_with_tags.count].as_json(root:"main_tag"))
       end 
       screenshots_hash = {screenshots: @screenshots_with_tags}
-      # byebug
-      @userflow_product_platform = @userflow_product_platform.merge(screenshots_hash)
-      render json: {userflow:@userflow_product_platform}
+      @userflow_product_platform_flowtag_screenshots = @userflow_product_platform_flowtag_screenshots.merge(screenshots_hash)
+      render json: {userflow:@userflow_product_platform_flowtag_screenshots}
       
     end
     
@@ -160,9 +172,15 @@ class UserFlowController < ApplicationController
   # /userflow/[product]/ プロダクトの他の動画一覧
   def product_userflow
     @product_userflow = UserFlow
-    .preload(:product, :platform)
-    .where(product_id: params[:product_id])
+    .eager_load(:product, :platform)
+    .where(products: {name: params[:product]})
     .as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
+
+
+    # @product_userflow = UserFlow
+    # .preload(:product, :platform)
+    # .where(product_id: params[:product_id])
+    # .as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
 
     render json: {userflow: @product_userflow}
     
