@@ -176,6 +176,7 @@ GEM
 
 PLATFORMS
   -darwin-20
+  aarch64-linux
   x86_64-linux
 
 DEPENDENCIES
@@ -197,4 +198,4 @@ RUBY VERSION
    ruby 2.6.6p146
 
 BUNDLED WITH
-   2.2.15
+   2.2.17

@@ -80,8 +80,8 @@ ActiveRecord::Schema.define(version: 2021_05_13_075805) do
 
   add_foreign_key "screen_shot_tags", "screen_shots"
   add_foreign_key "screen_shot_tags", "tags"
+  add_foreign_key "screen_shots", "products", column: "user_flow_id"
   add_foreign_key "screen_shots", "tags", column: "main_tag"
-  add_foreign_key "screen_shots", "user_flows", name: "screen_shots_ibfk_1"
   add_foreign_key "user_flow_tags", "tags"
   add_foreign_key "user_flow_tags", "user_flows"
   add_foreign_key "user_flows", "platforms"
