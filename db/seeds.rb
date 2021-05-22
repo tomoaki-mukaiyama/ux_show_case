@@ -1,6 +1,6 @@
 
-# Product.create!(name:"youtube",description:"動画サイト")
-# Product.create!(name:"twitter",description:"SNS")
+# # Product.create!(name:"youtube",description:"動画サイト")
+# # Product.create!(name:"twitter",description:"SNS")
 
 # Platform.create!(name:"ios")
 # Platform.create!(name:"android")

@@ -40,11 +40,15 @@ class ScreenshotController < ApplicationController
         .order(created_at: :desc)
         .limit(page_size)
         .offset(page_num * page_size)
+
+        # ScreenShot.preload(:tags,:user_flow).find_by(screenshots.id)
         
         @screenshots.each do|screenshot|
+          
           #:screenshot =>　maintag, tags           
+          preload_screenshot_for_tags =ScreenShot.preload(:tags,:user_flow).find_by(id:screenshot.id)
           screenshot_main_tag = screenshot.tags.find_by(id: screenshot.maintag_id).as_json(root: "maintag_id") #hash1
-          tags_hash = {tags: screenshot.tags.as_json} #hash2
+          tags_hash = {tags: preload_screenshot_for_tags.tags.as_json } #hash2
           hash = screenshot_main_tag.merge(tags_hash)  #hash1 + hash2 合体
           hash = screenshot.as_json.merge(hash) #screenshot + (hash1 + hash2) 合体
 
@@ -107,5 +111,3 @@ class ScreenshotController < ApplicationController
   
   
 end
-
-# byebug
