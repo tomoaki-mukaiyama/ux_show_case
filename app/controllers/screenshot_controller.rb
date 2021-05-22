@@ -46,7 +46,7 @@ class ScreenshotController < ApplicationController
           .preload(:tags, :user_flow)
           .find_by(id: screenshot.id)     #hash1 所有タグ一覧
           
-          @main_tag = tags_with_userflow.tags.find_by(id: screenshot.main_tag).as_json(root: "main_tag") 
+          @main_tag = tags_with_userflow.tags.find_by(id: screenshot.maintag_id).as_json(root: "main_tag") 
           @userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}],root:"userflow")
           screenshot_with_userflow = screenshot.as_json.merge(@userflow)      #hash merge
           screenshot_with_userflow_and_main_tag = screenshot_with_userflow.as_json(root:"screenshot").merge(@main_tag.as_json)      #hash merge
@@ -70,7 +70,7 @@ class ScreenshotController < ApplicationController
         .offset(page_num * page_size)
         
         @screenshots.each do|screenshot|
-          @main_tag = screenshot.tags.find_by(id: screenshot.main_tag).as_json(root: "main_tag")
+          @main_tag = screenshot.tags.find_by(id: screenshot.maintag_id).as_json(root: "main_tag")
           @userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}],root:"userflow")
           screenshot_with_userflow = screenshot.as_json.merge(@userflow)
           screenshot_with_userflow_and_main_tag = screenshot_with_userflow.as_json.merge(@main_tag.as_json)  #hash1

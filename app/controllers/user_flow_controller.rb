@@ -14,7 +14,7 @@ class UserFlowController < ApplicationController
   #------------isTopが１のタグ一覧--------------------------#-----------------------------------------------------------
   
   def tag_top
-    @tags = Tag.where(isTop: 1)
+    @tags = Tag.where(isTop: 1,tag_type: 0)
     @tags_array = []
     @tags.each do |tag|
         @tags_array << tag.as_json
@@ -24,7 +24,7 @@ class UserFlowController < ApplicationController
   #------------isRecommendが１のタグ一覧--------------------------#-----------------------------------------------------------
 
   def tag_recommend
-    @tags = Tag.where(isRecommend: 1)
+    @tags = Tag.where(isRecommend: 1,tag_type: 0)
     @tags_array = []
     @tags.each do |tag|
         @tags_array << tag.as_json
@@ -106,18 +106,24 @@ class UserFlowController < ApplicationController
     @target_userflow = UserFlow
     .eager_load(:tags,:product,:platform)
     .where(products:{name: params[:product]},platforms:{name:params[:platform]},tags: {slug: params[:flowtag]}) 
-    .order(created_at: :desc)
+    .order(local_version: :desc)
     .first
 
     if @target_userflow == nil #データが無ければ404notfoundを返す
       response_not_found #application.rb
     else
+
+      userflow_main_tag = @target_userflow.tags.find_by(id: @target_userflow.maintag_id).as_json(root:"maintag_id")
+
       @userflow_product_platform_flowtag = UserFlow
       .preload(:tags, :product, :platform)
       .find_by(id: @target_userflow.id)
       .as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags]) 
       
-      render json: {userflow: @userflow_product_platform_flowtag}
+      userflow_maintag_product_platform_tags = @userflow_product_platform_flowtag.merge(userflow_main_tag)
+
+      render json: {userflow: userflow_maintag_product_platform_tags}
+      # byebug
       
     end
   end
@@ -130,7 +136,7 @@ class UserFlowController < ApplicationController
     @target_userflow = UserFlow
     .eager_load(:tags,:product,:platform)
     .where(products:{name: params[:product]},platforms:{name:params[:platform]},tags: {slug: params[:flowtag]}) 
-    .order(created_at: :desc)
+    .order(local_version: :desc)
     .first
 
     if @target_userflow == nil #データが無ければ404notfoundを返す
@@ -139,19 +145,23 @@ class UserFlowController < ApplicationController
       @userflow = UserFlow
       .preload(:screen_shots, :product, :platform)
       .find_by(id: @target_userflow.id)
-
-      @userflow_product_platform_flowtag_screenshots = @userflow.as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}]) #,screen_shots:{include: :tags}
+      
+      userflow_main_tag = @target_userflow.tags.find_by(id: @target_userflow.maintag_id).as_json(root:"maintag_id")
+      userflow_product_platform = @userflow.as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
+      
+      userflow_product_platform_main_tag = userflow_product_platform.merge(userflow_main_tag)
       
       @screenshots = @userflow.screen_shots.as_json(include: :tags)
-      main_tag = []
-      @userflow.screen_shots.each {|n|main_tag << n.tags.find_by(id: n.main_tag)}
+      screenshot_main_tag = []
+      @userflow.screen_shots.each {|n|screenshot_main_tag << n.tags.find_by(id: n.maintag_id)}
+      
       @screenshots_with_tags = []
       @screenshots.each do|shots|
-        @screenshots_with_tags << shots.merge(main_tag[@screenshots_with_tags.count].as_json(root:"main_tag"))
+        @screenshots_with_tags << shots.merge(screenshot_main_tag[@screenshots_with_tags.count].as_json(root:"maintag_id"))
       end 
       screenshots_hash = {screenshots: @screenshots_with_tags}
-      @userflow_product_platform_flowtag_screenshots = @userflow_product_platform_flowtag_screenshots.merge(screenshots_hash)
-      render json: {userflow:@userflow_product_platform_flowtag_screenshots}
+      userflow_product_platform_screenshots_main_tag = userflow_product_platform_main_tag.merge(screenshots_hash)
+      render json: {userflow:userflow_product_platform_screenshots_main_tag}
       
     end
     
@@ -159,12 +169,23 @@ class UserFlowController < ApplicationController
   #------------当該プロダクトの他の動画取得-------------------#-----------------------------------------------------------
   # /userflow/[product]/ プロダクトの他の動画一覧
   def product_userflow
-    @product_userflow = UserFlow
-    .eager_load(:product, :platform)
+    userflows = UserFlow
+    .eager_load(:product, :platform, :tags)
     .where(products: {name: params[:product]})
-    .as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
+    
+    main_tag = []
+    userflows.each do |userflow|
+      main_tag << userflow.tags.find_by(id: userflow.maintag_id)
+    end
+    
+    array = []
+    userflows_tags = userflows.as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}, :tags])
+    userflows_tags.each do |userflow|
+      array << userflow.merge(main_tag[array.count].as_json(root:"maintag_id"))
+    end
+    
 
-    render json: {userflow: @product_userflow}
+    render json: {userflow: array}
     
   end
   #-----------------------------------------------------------#-----------------------------------------------------------

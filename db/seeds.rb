@@ -42,7 +42,7 @@
 # main_tag=[3,4,5,6,3,4,5,6]
 # 2.times do |n|
 #     ScreenShot.all.each do |ss|
-#         ss.update!(main_tag: main_tag[ss.id - 1])
+#         ss.update!(maintag_id: main_tag[ss.id - 1])
 #     end
 # end
 
