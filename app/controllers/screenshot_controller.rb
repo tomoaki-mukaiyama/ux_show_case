@@ -42,24 +42,27 @@ class ScreenshotController < ApplicationController
         .offset(page_num * page_size)
         
         @screenshots.each do|screenshot|
-          tags_with_userflow = ScreenShot
-          .preload(:tags, :user_flow)
-          .find_by(id: screenshot.id)     #hash1 所有タグ一覧
+          #:screenshot =>　maintag, tags           
+          screenshot_main_tag = screenshot.tags.find_by(id: screenshot.maintag_id).as_json(root: "maintag_id") #hash1
+          tags_hash = {tags: screenshot.tags.as_json} #hash2
+          hash = screenshot_main_tag.merge(tags_hash)  #hash1 + hash2 合体
+          hash = screenshot.as_json.merge(hash) #screenshot + (hash1 + hash2) 合体
+
+          #:userflow => maintag, product, platform
+          userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
+          userflow_maintag = screenshot.user_flow.tags.find_by(id:screenshot.user_flow.maintag_id).as_json(root:"maintag_id")
+          userflow_with_maintag = {userflow: userflow.merge(userflow_maintag)}
           
-          @main_tag = tags_with_userflow.tags.find_by(id: screenshot.maintag_id).as_json(root: "main_tag") 
-          @userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}],root:"userflow")
-          screenshot_with_userflow = screenshot.as_json.merge(@userflow)      #hash merge
-          screenshot_with_userflow_and_main_tag = screenshot_with_userflow.as_json(root:"screenshot").merge(@main_tag.as_json)      #hash merge
+          #:screenshot + :userflow 合体
+          screenshot_userflow = hash.merge(userflow_with_maintag)
+          # screenshot_userflow_main_tag = screenshot_userflow.as_json.merge(screenshot_main_tag.as_json)  #hash1
           
           
-          all_tags = tags_with_userflow.tags.as_json #hash2
-          tags_hash = {tags: all_tags}
-          hash = screenshot_with_userflow_and_main_tag.merge(tags_hash)
           
           if @screenshots.count != 1 #screenshotが複数ある場合、配列に入れる
-            @screenshots_array << hash
+            @screenshots_array << screenshot_userflow
           else
-            @screenshots_array = hash #一つの場合一つだけ出力
+            @screenshots_array = screenshot_userflow #一つの場合一つだけ出力
           end
         end
         
@@ -70,27 +73,33 @@ class ScreenshotController < ApplicationController
         .offset(page_num * page_size)
         
         @screenshots.each do|screenshot|
-          @main_tag = screenshot.tags.find_by(id: screenshot.maintag_id).as_json(root: "main_tag")
-          @userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}],root:"userflow")
-          screenshot_with_userflow = screenshot.as_json.merge(@userflow)
-          screenshot_with_userflow_and_main_tag = screenshot_with_userflow.as_json.merge(@main_tag.as_json)  #hash1
+          #:screenshot =>　maintag, tags           
+          screenshot_main_tag = screenshot.tags.find_by(id: screenshot.maintag_id).as_json(root: "maintag_id") #hash1
+          tags_hash = {tags: screenshot.tags.as_json} #hash2
+          hash = screenshot_main_tag.merge(tags_hash)  #hash1 + hash2 合体
+          hash = screenshot.as_json.merge(hash) #screenshot + (hash1 + hash2) 合体
+
+          #:userflow => maintag, product, platform
+          userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
+          userflow_maintag = screenshot.user_flow.tags.find_by(id:screenshot.user_flow.maintag_id).as_json(root:"maintag_id")
+          userflow_with_maintag = {userflow: userflow.merge(userflow_maintag)}
           
-          all_tags = screenshot.tags.as_json #hash2
-          tags_hash = {tags: all_tags}
-          hash = screenshot_with_userflow_and_main_tag.merge(tags_hash)  #ふたつのハッシュをmerge
+          #:screenshot + :userflow 合体
+          screenshot_userflow = hash.merge(userflow_with_maintag)
+          # screenshot_userflow_main_tag = screenshot_userflow.as_json.merge(screenshot_main_tag.as_json)  #hash1
           
-          # byebug
+          
           
           if @screenshots.count != 1 #screenshotが複数ある場合、配列に入れる
-            @screenshots_array << hash
+            @screenshots_array << screenshot_userflow
           else
-            @screenshots_array = hash #一つの場合一つだけ出力
+            @screenshots_array = screenshot_userflow #一つの場合一つだけ出力
           end
         end
       end
       
       render json: {screenshots: @screenshots_array} 
-      # render json: {screenshots: @screenshots_with_tags,userflow:@userflow_product_platform}
+      # render json: {screenshots: @screenshots_with_tags,userflow:userflow_product_platform}
       
     end
   end
@@ -98,3 +107,5 @@ class ScreenshotController < ApplicationController
   
   
 end
+
+# byebug

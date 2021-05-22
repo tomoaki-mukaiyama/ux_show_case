@@ -68,6 +68,8 @@ class UserFlowController < ApplicationController
           .find_by(id: userflow.id)
           .as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags])     #hash1 所有タグ一覧
           
+          maintag = userflow.tags.find_by(id: userflow.maintag_id).as_json(root:"maintag_id")
+          hash = hash.merge(maintag)
 
           if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
             @userflows_array <<  hash
@@ -82,7 +84,9 @@ class UserFlowController < ApplicationController
         .offset(page_num * page_size)
         
         @userflows.each do|userflow|
-            hash = userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags])
+          hash = userflow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags])
+          maintag = userflow.tags.find_by(id: userflow.maintag_id).as_json(root:"maintag_id")
+          hash = hash.merge(maintag)
 
           if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
             @userflows_array << hash
@@ -123,7 +127,6 @@ class UserFlowController < ApplicationController
       userflow_maintag_product_platform_tags = @userflow_product_platform_flowtag.merge(userflow_main_tag)
 
       render json: {userflow: userflow_maintag_product_platform_tags}
-      # byebug
       
     end
   end
@@ -190,3 +193,5 @@ class UserFlowController < ApplicationController
   end
   #-----------------------------------------------------------#-----------------------------------------------------------
 end
+
+          # byebug
