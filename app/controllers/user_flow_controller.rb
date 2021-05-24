@@ -124,7 +124,7 @@ class UserFlowController < ApplicationController
       response_not_found #application.rb
     else
 
-      userflow_main_tag = @target_userflow.tags.find_by(id: @target_userflow.maintag_id).as_json(root:"maintag_id")
+      userflow_main_tag = @target_userflow.tags.find_by(id: @target_userflow.maintag_id).as_json(root:"maintag")
 
       @userflow_product_platform_flowtag = UserFlow
       .preload(:tags, :product, :platform)
@@ -156,7 +156,7 @@ class UserFlowController < ApplicationController
       .preload(:screen_shots, :product, :platform)
       .find_by(id: @target_userflow.id)
       
-      userflow_main_tag = @target_userflow.tags.find_by(id: @target_userflow.maintag_id).as_json(root:"maintag_id")
+      userflow_main_tag = @target_userflow.tags.find_by(id: @target_userflow.maintag_id).as_json(root:"maintag")
       userflow_product_platform = @userflow.as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
       
       userflow_product_platform_main_tag = userflow_product_platform.merge(userflow_main_tag)
@@ -167,7 +167,7 @@ class UserFlowController < ApplicationController
       
       @screenshots_with_tags = []
       @screenshots.each do|shots|
-        @screenshots_with_tags << shots.merge(screenshot_main_tag[@screenshots_with_tags.count].as_json(root:"maintag_id"))
+        @screenshots_with_tags << shots.merge(screenshot_main_tag[@screenshots_with_tags.count].as_json(root:"maintag"))
       end 
       screenshots_hash = {screenshots: @screenshots_with_tags}
       userflow_product_platform_screenshots_main_tag = userflow_product_platform_main_tag.merge(screenshots_hash)
@@ -191,7 +191,7 @@ class UserFlowController < ApplicationController
     array = []
     userflows_tags = userflows.as_json(include:[{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}, :tags])
     userflows_tags.each do |userflow|
-      array << userflow.merge(main_tag[array.count].as_json(root:"maintag_id"))
+      array << userflow.merge(main_tag[array.count].as_json(root:"maintag"))
     end
     
 
