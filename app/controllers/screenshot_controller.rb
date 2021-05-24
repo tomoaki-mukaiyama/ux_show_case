@@ -47,14 +47,14 @@ class ScreenshotController < ApplicationController
           
           #:screenshot =>　maintag, tags
           preload_screenshot_for_tags =ScreenShot.preload(:tags,:user_flow).find_by(id:screenshot.id)
-          screenshot_main_tag = screenshot.tags.find_by(id: screenshot.maintag_id).as_json(root: "maintag_id") #hash1
+          screenshot_main_tag = screenshot.tags.find_by(id: screenshot.maintag_id).as_json(root: "maintag") #hash1
           tags_hash = {tags: preload_screenshot_for_tags.tags.as_json } #hash2
           hash = screenshot_main_tag.merge(tags_hash)  #hash1 + hash2 合体
           hash = screenshot.as_json.merge(hash) #screenshot + (hash1 + hash2) 合体
 
           #:userflow => maintag, product, platform
           userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
-          userflow_maintag = screenshot.user_flow.tags.find_by(id:screenshot.user_flow.maintag_id).as_json(root:"maintag_id")
+          userflow_maintag = screenshot.user_flow.tags.find_by(id:screenshot.user_flow.maintag_id).as_json(root:"maintag")
           userflow_with_maintag = {userflow: userflow.merge(userflow_maintag)}
           
           #:screenshot + :userflow 合体
@@ -78,14 +78,14 @@ class ScreenshotController < ApplicationController
         
         @screenshots.each do|screenshot|
           #:screenshot =>　maintag, tags           
-          screenshot_main_tag = screenshot.tags.find_by(id: screenshot.maintag_id).as_json(root: "maintag_id") #hash1
+          screenshot_main_tag = screenshot.tags.find_by(id: screenshot.maintag_id).as_json(root: "maintag") #hash1
           tags_hash = {tags: screenshot.tags.as_json} #hash2
           hash = screenshot_main_tag.merge(tags_hash)  #hash1 + hash2 合体
           hash = screenshot.as_json.merge(hash) #screenshot + (hash1 + hash2) 合体
 
           #:userflow => maintag, product, platform
           userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
-          userflow_maintag = screenshot.user_flow.tags.find_by(id:screenshot.user_flow.maintag_id).as_json(root: "maintag_id")
+          userflow_maintag = screenshot.user_flow.tags.find_by(id:screenshot.user_flow.maintag_id).as_json(root: "maintag")
           userflow_with_maintag = {userflow: userflow.merge(userflow_maintag)}
           
           #:screenshot + :userflow 合体
