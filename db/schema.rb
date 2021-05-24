@@ -10,19 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_21_150909) do
+ActiveRecord::Schema.define(version: 2021_05_24_124738) do
 
   create_table "platforms", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.string "name"
+    t.string "name", limit: 255
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "slug"
   end
 
   create_table "products", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.string "name"
-    t.string "description"
+    t.string "name", limit: 255
+    t.string "description", limit: 255
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "icon_path"
+    t.string "slug"
   end
 
   create_table "screen_shot_tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
@@ -36,7 +39,7 @@ ActiveRecord::Schema.define(version: 2021_05_21_150909) do
 
   create_table "screen_shots", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "user_flow_id", null: false
-    t.string "path"
+    t.string "path", limit: 255
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.bigint "maintag_id"
@@ -46,12 +49,12 @@ ActiveRecord::Schema.define(version: 2021_05_21_150909) do
 
   create_table "tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.boolean "tag_type"
-    t.string "isTop"
-    t.string "isRecommend"
+    t.string "isTop", limit: 255
+    t.string "isRecommend", limit: 255
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "name"
-    t.string "slug", null: false
+    t.string "name", limit: 255
+    t.string "slug", limit: 255, null: false
     t.index ["slug"], name: "index_tags_on_slug", unique: true
   end
 
@@ -67,11 +70,11 @@ ActiveRecord::Schema.define(version: 2021_05_21_150909) do
   create_table "user_flows", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.bigint "product_id", null: false
     t.bigint "platform_id", null: false
-    t.string "bg_color"
-    t.string "icon_path"
-    t.string "version"
-    t.string "video_time_string"
-    t.string "video_path"
+    t.string "bg_color", limit: 255
+    t.string "thumbnail_path", limit: 255
+    t.string "version", limit: 255
+    t.string "video_time_string", limit: 255
+    t.string "video_path", limit: 255
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "local_version"

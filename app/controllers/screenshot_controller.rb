@@ -85,7 +85,7 @@ class ScreenshotController < ApplicationController
 
           #:userflow => maintag, product, platform
           userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}}])
-          userflow_maintag = screenshot.user_flow.tags.find_by(id:screenshot.user_flow.maintag_id).as_json(root:"maintag_id")
+          userflow_maintag = screenshot.user_flow.tags.find_by(id:screenshot.user_flow.maintag_id).as_json(root: "maintag_id")
           userflow_with_maintag = {userflow: userflow.merge(userflow_maintag)}
           
           #:screenshot + :userflow 合体
