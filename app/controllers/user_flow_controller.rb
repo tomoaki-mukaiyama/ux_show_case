@@ -22,6 +22,13 @@ class UserFlowController < ApplicationController
     render json: { tags: @tags_array }
   end
   #------------isRecommendが１のタグ一覧--------------------------#-----------------------------------------------------------
+  def flowtag
+
+    @tag = Tag.where(slug: params[:flowtag])
+    render json: { tag: @tag }
+  end
+
+  #------------isRecommendが１のタグ一覧--------------------------#-----------------------------------------------------------
 
   def tag_recommend
     @tags = Tag.where(isRecommend: 1,tag_type: 0)

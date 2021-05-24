@@ -1,6 +1,7 @@
 Rails.application.routes.draw do
 
   get "userflow_tags", to: "user_flow#tag_index"
+  get "userflow_tags/:flowtag", to: "user_flow#flowtag"
   get "userflow_tags/top", to: "user_flow#tag_top"
   get "userflow_tags/recommend", to: "user_flow#tag_recommend"
 

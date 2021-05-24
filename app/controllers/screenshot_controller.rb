@@ -45,7 +45,7 @@ class ScreenshotController < ApplicationController
         
         @screenshots.each do|screenshot|
           
-          #:screenshot =>　maintag, tags           
+          #:screenshot =>　maintag, tags
           preload_screenshot_for_tags =ScreenShot.preload(:tags,:user_flow).find_by(id:screenshot.id)
           screenshot_main_tag = screenshot.tags.find_by(id: screenshot.maintag_id).as_json(root: "maintag_id") #hash1
           tags_hash = {tags: preload_screenshot_for_tags.tags.as_json } #hash2
