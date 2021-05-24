@@ -62,12 +62,12 @@ class UserFlowController < ApplicationController
         .limit(page_size)
         .offset(page_num * page_size)
         
+        # byebug
         @userflows.each do|userflow|
           hash = UserFlow
           .preload(:tags, :product, :platform)
           .find_by(id: userflow.id)
           .as_json(include: [{product:{only:[:id,:name, :description]}},{platform:{only:[:id,:name]}},:tags])     #hash1 所有タグ一覧
-          
           maintag = userflow.tags.find_by(id: userflow.maintag_id).as_json(root:"maintag_id")
           hash = hash.merge(maintag)
 
