@@ -74,7 +74,7 @@ class UserFlowController < ApplicationController
           hash = UserFlow
           .preload(:tags, :product, :platform)
           .find_by(id: userflow.id)
-          .as_json(include: [{product:{only:[:id,:name, :description, :slug]}},{platform:{only:[:id,:name, :slug]}},:tags])     #hash1 所有タグ一覧
+          .as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])     #hash1 所有タグ一覧
           maintag = userflow.tags.find_by(id: userflow.maintag_id).as_json(root:"maintag")
           hash = hash.merge(maintag)
 
@@ -91,7 +91,7 @@ class UserFlowController < ApplicationController
         .offset(page_num * page_size)
         
         @userflows.each do|userflow|
-          hash = userflow.as_json(include: [{product:{only:[:id,:name, :description, :slug]}},{platform:{only:[:id,:name, :slug]}},:tags])
+          hash = userflow.as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
           maintag = userflow.tags.find_by(id: userflow.maintag_id).as_json(root:"maintag")
           hash = hash.merge(maintag)
 
@@ -129,7 +129,7 @@ class UserFlowController < ApplicationController
       @userflow_product_platform_flowtag = UserFlow
       .preload(:tags, :product, :platform)
       .find_by(id: @target_userflow.id)
-      .as_json(include:[{product:{only:[:id,:name, :description, :slug]}},{platform:{only:[:id,:name, :slug]}},:tags]) 
+      .as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags]) 
       
       userflow_maintag_product_platform_tags = @userflow_product_platform_flowtag.merge(userflow_main_tag)
 
@@ -152,15 +152,11 @@ class UserFlowController < ApplicationController
     if @target_userflow == nil #データが無ければ404notfoundを返す
       response_not_found #application.rb
     else
+      #指定userflowの全screenshotsを得る為のpreload
       @userflow = UserFlow
-      .preload(:screen_shots, :product, :platform)
+      .preload(:screen_shots)
       .find_by(id: @target_userflow.id)
-      
-      userflow_main_tag = @target_userflow.tags.find_by(id: @target_userflow.maintag_id).as_json(root:"maintag")
-      userflow_product_platform = @userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug]}},{platform:{only:[:id,:name, :slug]}}])
-      
-      userflow_product_platform_main_tag = userflow_product_platform.merge(userflow_main_tag)
-      
+
       @screenshots = @userflow.screen_shots.as_json(include: :tags)
       screenshot_main_tag = []
       @userflow.screen_shots.each {|n|screenshot_main_tag << n.tags.find_by(id: n.maintag_id)}
@@ -169,9 +165,7 @@ class UserFlowController < ApplicationController
       @screenshots.each do|shots|
         @screenshots_with_tags << shots.merge(screenshot_main_tag[@screenshots_with_tags.count].as_json(root:"maintag"))
       end 
-      screenshots_hash = {screenshots: @screenshots_with_tags}
-      userflow_product_platform_screenshots_main_tag = userflow_product_platform_main_tag.merge(screenshots_hash)
-      render json: {userflow:userflow_product_platform_screenshots_main_tag}
+      render json: {screenshots: @screenshots_with_tags}
       
     end
     
@@ -189,7 +183,7 @@ class UserFlowController < ApplicationController
     end
     
     array = []
-    userflows_tags = userflows.as_json(include:[{product:{only:[:id,:name, :description, :slug]}},{platform:{only:[:id,:name, :slug]}}, :tags])
+    userflows_tags = userflows.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}}, :tags])
     userflows_tags.each do |userflow|
       array << userflow.merge(main_tag[array.count].as_json(root:"maintag"))
     end
