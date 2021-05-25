@@ -171,25 +171,46 @@ class UserFlowController < ApplicationController
     
   end
   #------------当該プロダクトの他の動画取得-------------------#-----------------------------------------------------------
-  # /userflow/[product]/ プロダクトの他の動画一覧
+  # /userflows/[product]/ プロダクトの他の動画一覧
   def product_userflow
-    userflows = UserFlow
-    .eager_load(:product, :platform, :tags)
-    .where(products: {name: params[:product]})
-    
-    main_tag = []
-    userflows.each do |userflow|
-      main_tag << userflow.tags.find_by(id: userflow.maintag_id)
-    end
-    
-    array = []
-    userflows_tags = userflows.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}}, :tags])
-    userflows_tags.each do |userflow|
-      array << userflow.merge(main_tag[array.count].as_json(root:"maintag"))
-    end
-    
 
-    render json: {userflow: array}
+    if params[:limit] == 0.to_s       #limit=0を1として扱う
+      page_size = params[:limit].to_i + 1
+    else
+      page_size = params[:limit].to_i
+    end
+    
+    if params[:page] == 0.to_s        #page=0を1として扱う
+      page_num  = params[:page].to_i
+    else
+      page_num  = params[:page].to_i - 1
+    end
+    
+    if params[:page].to_s.empty? || params[:limit].to_s.empty? #pageとlimitのリクエスト不備の場合エラーを返す
+      response_bad_request #(application_controller.rb)
+    else
+        
+      userflows = UserFlow
+      .eager_load(:product, :platform, :tags)
+      .where(products: {name: params[:product]})
+      .limit(page_size)
+      .offset(page_num * page_size)
+
+      
+      main_tag = []
+      userflows.each do |userflow|
+        main_tag << userflow.tags.find_by(id: userflow.maintag_id)
+      end
+      
+      array = []
+      userflows_tags = userflows.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}}, :tags])
+      userflows_tags.each do |userflow|
+        array << userflow.merge(main_tag[array.count].as_json(root:"maintag"))
+      end
+      
+
+      render json: {userflow: array}
+    end
     
   end
   #-----------------------------------------------------------#-----------------------------------------------------------

@@ -12,5 +12,5 @@ Rails.application.routes.draw do
 
   get "/userflow/:product/:platform/:flowtag" , to: "user_flow#detail"
   get "/userflow/:product/:platform/:flowtag/screenshots" , to: "user_flow#screenshot"
-  get "/userflow/:product" , to: "user_flow#product_userflow"
+  get "/userflows/:product" , to: "user_flow#product_userflow"
 end

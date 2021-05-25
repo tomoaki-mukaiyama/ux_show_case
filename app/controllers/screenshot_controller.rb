@@ -28,8 +28,6 @@ class ScreenshotController < ApplicationController
       response_bad_request  #application_controller.rb
     else
       
-      
-      
       @screenshots_array = []
       if params[:tag] #ーーーーーータグ指定ありーーーーーーー
         # byebug

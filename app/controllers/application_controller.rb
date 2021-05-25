@@ -3,12 +3,7 @@ class ApplicationController < ActionController::API
     def response_bad_request
       render status: 400, json: { status: 400, 
                                   message: 'Bad Request', 
-                                  invalid_params: [
-                                                    { 
-                                                      example1: "userflow?page=2&limit=2",
-                                                      example2: "/userflow/1"
-                                                    }
-                                                  ]
+                                  invalid_url: 'page & limit must exist'
                                 }
     end
 
