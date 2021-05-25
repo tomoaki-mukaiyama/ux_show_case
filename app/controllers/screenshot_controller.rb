@@ -53,7 +53,7 @@ class ScreenshotController < ApplicationController
           hash = screenshot.as_json.merge(hash) #screenshot + (hash1 + hash2) 合体
 
           #:userflow => maintag, product, platform
-          userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description, :slug]}},{platform:{only:[:id,:name, :slug]}}])
+          userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}}])
           userflow_maintag = screenshot.user_flow.tags.find_by(id:screenshot.user_flow.maintag_id).as_json(root:"maintag")
           userflow_with_maintag = {userflow: userflow.merge(userflow_maintag)}
           
@@ -84,7 +84,7 @@ class ScreenshotController < ApplicationController
           hash = screenshot.as_json.merge(hash) #screenshot + (hash1 + hash2) 合体
 
           #:userflow => maintag, product, platform
-          userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description, :slug]}},{platform:{only:[:id,:name, :slug]}}])
+          userflow = screenshot.user_flow.as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}}])
           userflow_maintag = screenshot.user_flow.tags.find_by(id:screenshot.user_flow.maintag_id).as_json(root: "maintag")
           userflow_with_maintag = {userflow: userflow.merge(userflow_maintag)}
           
