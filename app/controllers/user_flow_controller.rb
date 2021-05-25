@@ -209,7 +209,7 @@ class UserFlowController < ApplicationController
       end
       
 
-      render json: {userflow: array}
+      render json: {userflows: array}
     end
     
   end
