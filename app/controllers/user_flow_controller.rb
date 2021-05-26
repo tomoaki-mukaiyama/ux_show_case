@@ -35,8 +35,12 @@ class UserFlowController < ApplicationController
   #------------指定したタグ一件--------------------------#-----------------------------------------------------------
   def flowtag
 
-    @tag = Tag.where(slug: params[:flowtag])[0]
-    render json: { tag: @tag }
+    @tag = Tag.find_by(id: params[:id])
+    if @tag.tag_type == true
+      respond_tag_type_error
+    else
+      render json: { tag: @tag }
+    end
   end
   
   #------------最新のuserflow(動画)取得----------------#-----------------------------------------------------------
@@ -195,10 +199,41 @@ class UserFlowController < ApplicationController
       userflows_tags.each do |userflow|
         array << userflow.merge(main_tag[array.count].as_json(root:"maintag"))
       end
-      
 
       render json: {userflows: array}
     end
   end
+  #------------当該プロダクトの他の動画取得-------------------#-----------------------------------------------------------
+  def recommended_userflow
+    if params[:limit] == 0.to_s       #limit=0を1として扱う
+      page_size = params[:limit].to_i + 1
+    else
+      page_size = params[:limit].to_i
+    end
+    
+    if params[:page] == 0.to_s        #page=0を1として扱う
+      page_num  = params[:page].to_i
+    else
+      page_num  = params[:page].to_i - 1
+    end
+    
+    if params[:page].to_s.empty? || params[:limit].to_s.empty? #pageとlimitのリクエスト不備の場合エラーを返す
+      response_bad_request #(application_controller.rb)
+    else
+      userflows = UserFlow.find_by(id: params[:id])
+      .product.user_flows
+      .limit(page_size)
+      .offset(page_num * page_size)
+      
+      recommended = []
+      userflows.each do |userflow|
+        recommended << userflow if userflow.id != params[:id].to_i
+      end
+      render json: {userflows: recommended}
+    end
+    
+  end
   #-----------------------------------------------------------#-----------------------------------------------------------
 end
+
+# byebug
