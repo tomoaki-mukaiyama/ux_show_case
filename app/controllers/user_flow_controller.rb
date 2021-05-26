@@ -203,7 +203,7 @@ class UserFlowController < ApplicationController
       render json: {userflows: array}
     end
   end
-  #------------当該プロダクトの他の動画取得-------------------#-----------------------------------------------------------
+  #------------関連動画取得-------------------#-----------------------------------------------------------
   def recommended_userflow
     if params[:limit] == 0.to_s       #limit=0を1として扱う
       page_size = params[:limit].to_i + 1
@@ -225,16 +225,22 @@ class UserFlowController < ApplicationController
       .where.not(id: params[:id])
       .limit(page_size)
       .offset(page_num * page_size)
+      # byebug
+      userflow_array = []
+      userflows.each do |userflow|
+        userflow_product_platform = userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
+        maintag = userflow.tags.find_by(id: userflow.maintag_id).as_json(root:"maintag")
+        if userflows.count != 1 #userflowが複数ある場合、配列に入れる
+          userflow_array << userflow_product_platform.merge(maintag)
+        else
+          userflow_array = userflow_product_platform.merge(maintag) #一つの場合一つだけ出力
+        end
+      end
+
       
-      # recommended = []
-      # userflows.each do |userflow|
-      #   recommended << userflow if userflow.id != params[:id].to_i
-      # end
-      render json: {userflows: userflows}
+      render json: {userflows: userflow_array}
     end
     
   end
   #-----------------------------------------------------------#-----------------------------------------------------------
 end
-
-# byebug
