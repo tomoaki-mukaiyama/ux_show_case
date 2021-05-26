@@ -3,35 +3,31 @@ class UserFlowController < ApplicationController
   #------------tag_typeの値が1のタグ一覧--------------------------#-----------------------------------------------------------
   
   def tag_index
-    
-    @tags = Tag.where(tag_type: 0)
-    @tags_array = []
-    @tags.each do |tag|
+    # byebug
+    if params[:flg] == "recommend"
+      @tags = Tag.where(isRecommend: 1,tag_type: 0)
+      @tags_array = []
+      @tags.each do |tag|
         @tags_array << tag.as_json
+      end
+      render json: { tags: @tags_array }
+    elsif params[:flg] == "top"
+      @tags = Tag.where(isTop: 1,tag_type: 0)
+      @tags_array = []
+      @tags.each do |tag|
+          @tags_array << tag.as_json
+      end
+      render json: { tags: @tags_array }
+    else
+      @tags = Tag.where(tag_type: 0)
+      @tags_array = []
+      @tags.each do |tag|
+          @tags_array << tag.as_json
+      end
+      render json: { tags: @tags_array }
     end
-    render json: { tags: @tags_array }
   end
-  #------------isTopが１のタグ一覧--------------------------#-----------------------------------------------------------
-  
-  def tag_top
-    @tags = Tag.where(isTop: 1,tag_type: 0)
-    @tags_array = []
-    @tags.each do |tag|
-        @tags_array << tag.as_json
-    end
-    render json: { tags: @tags_array }
-  end
-  
-  #------------isRecommendが１のタグ一覧--------------------------#-----------------------------------------------------------
-  
-  def tag_recommend
-    @tags = Tag.where(isRecommend: 1,tag_type: 0)
-    @tags_array = []
-    @tags.each do |tag|
-      @tags_array << tag.as_json
-    end
-    render json: { tags: @tags_array }
-  end
+ 
   #------------指定したタグ一件--------------------------#-----------------------------------------------------------
   def flowtag
 
