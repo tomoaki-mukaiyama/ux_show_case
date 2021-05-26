@@ -222,7 +222,7 @@ class UserFlowController < ApplicationController
     else
       userflows = UserFlow.find_by(id: params[:id])
       .product.user_flows
-      .limit(page_size)
+      .limit(page_size + 1)
       .offset(page_num * page_size)
       
       recommended = []
