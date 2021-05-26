@@ -222,14 +222,15 @@ class UserFlowController < ApplicationController
     else
       userflows = UserFlow.find_by(id: params[:id])
       .product.user_flows
-      .limit(page_size + 1)
+      .where.not(id: params[:id])
+      .limit(page_size)
       .offset(page_num * page_size)
       
-      recommended = []
-      userflows.each do |userflow|
-        recommended << userflow if userflow.id != params[:id].to_i
-      end
-      render json: {userflows: recommended}
+      # recommended = []
+      # userflows.each do |userflow|
+      #   recommended << userflow if userflow.id != params[:id].to_i
+      # end
+      render json: {userflows: userflows}
     end
     
   end
