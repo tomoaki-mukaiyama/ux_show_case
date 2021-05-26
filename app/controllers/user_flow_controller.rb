@@ -68,7 +68,7 @@ class UserFlowController < ApplicationController
       if params[:tag] #ーーーーーータグ指定ありーーーーーーー
         
         @userflows = UserFlow.eager_load(:tags)   #タグ絞り込み　＆　全件取得
-        .where(tags: {slug: params[:tag]})
+        .where(tags: {id: params[:tag]})
         .order(created_at: :desc)
         .limit(page_size)
         .offset(page_num * page_size)

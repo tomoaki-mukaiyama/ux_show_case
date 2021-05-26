@@ -34,7 +34,7 @@ class ScreenshotController < ApplicationController
         
         #タグ絞り込み　＆　全件取得　このidとmain_tagを下で使う
         @screenshots = ScreenShot.eager_load(:tags)   
-        .where(tags: {slug: params[:tag]})
+        .where(tags: {id: params[:tag]})
         .order(created_at: :desc)
         .limit(page_size)
         .offset(page_num * page_size)
