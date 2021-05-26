@@ -111,51 +111,41 @@ class UserFlowController < ApplicationController
   end
   
   #------------動画詳細ページ取得----------------------------#-----------------------------------------------------------
-  # /userflow/[product]/[platform]/[flowtag] userflow動画の詳細ページ 最新の１件
+  # /userflows/[userflow_id] userflow動画の詳細ページ 最新の１件
   
+  # .where(products:{name: params[:product]},platforms:{name:params[:platform]},tags: {slug: params[:flowtag]}) 
   def detail
-    @target_userflow = UserFlow
-    .eager_load(:tags,:product,:platform)
-    .where(products:{name: params[:product]},platforms:{name:params[:platform]},tags: {slug: params[:flowtag]}) 
-    .order(local_version: :desc)
-    .first
+    userflow = UserFlow
+    .find_by(id: params[:id])
+    # .preload(:tags, :product, :platform)
 
-    if @target_userflow == nil #データが無ければ404notfoundを返す
+    if userflow == nil #データが無ければ404notfoundを返す
       response_not_found #application.rb
     else
 
-      userflow_main_tag = @target_userflow.tags.find_by(id: @target_userflow.maintag_id).as_json(root:"maintag")
+      userflow_main_tag = userflow.tags.find_by(id: userflow.maintag_id).as_json(root:"maintag")
 
-      @userflow_product_platform_flowtag = UserFlow
-      .preload(:tags, :product, :platform)
-      .find_by(id: @target_userflow.id)
-      .as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags]) 
+      userflow = userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags]) 
       
-      userflow_maintag_product_platform_tags = @userflow_product_platform_flowtag.merge(userflow_main_tag)
+      userflow_product_platform_tags_maintag = userflow.merge(userflow_main_tag)
 
-      render json: {userflow: userflow_maintag_product_platform_tags}
+      render json: {userflow: userflow_product_platform_tags_maintag}
       
     end
   end
   
   #------------動画のスクショ一覧取得----------------#-----------------------------------------------------------
-  # /userflow/[product]/[platform]/[flowtag]/screen_shot 
-  def screenshot
+  # /userflows/[userflow_id]/screen_shot 
+  def screenshots
 
     #絞り込みでターゲットのidを取得 #eager_loadではスクショのタグを芋づる取得できない為、そのidでpreloadでfind_byする
-    @target_userflow = UserFlow
-    .eager_load(:tags,:product,:platform)
-    .where(products:{name: params[:product]},platforms:{name:params[:platform]},tags: {slug: params[:flowtag]}) 
-    .order(local_version: :desc)
-    .first
+    @userflow = UserFlow
+    .preload(:tags)
+    .find_by(id: params[:id])
 
-    if @target_userflow == nil #データが無ければ404notfoundを返す
+    if @userflow == nil #データが無ければ404notfoundを返す
       response_not_found #application.rb
     else
-      #指定userflowの全screenshotsを得る為のpreload
-      @userflow = UserFlow
-      .preload(:screen_shots)
-      .find_by(id: @target_userflow.id)
 
       @screenshots = @userflow.screen_shots.as_json(include: :tags)
       screenshot_main_tag = []
@@ -171,9 +161,8 @@ class UserFlowController < ApplicationController
     
   end
   #------------当該プロダクトの他の動画取得-------------------#-----------------------------------------------------------
-  # /userflows/[product]/ プロダクトの他の動画一覧
+  # /products/[product_id]/ プロダクトの他の動画一覧
   def product_userflow
-
     if params[:limit] == 0.to_s       #limit=0を1として扱う
       page_size = params[:limit].to_i + 1
     else
@@ -189,13 +178,12 @@ class UserFlowController < ApplicationController
     if params[:page].to_s.empty? || params[:limit].to_s.empty? #pageとlimitのリクエスト不備の場合エラーを返す
       response_bad_request #(application_controller.rb)
     else
-        
+
       userflows = UserFlow
       .eager_load(:product, :platform, :tags)
-      .where(products: {name: params[:product]})
+      .where(products: {id: params[:id]})
       .limit(page_size)
       .offset(page_num * page_size)
-
       
       main_tag = []
       userflows.each do |userflow|
@@ -211,9 +199,6 @@ class UserFlowController < ApplicationController
 
       render json: {userflows: array}
     end
-    
   end
   #-----------------------------------------------------------#-----------------------------------------------------------
 end
-
-          # byebug
