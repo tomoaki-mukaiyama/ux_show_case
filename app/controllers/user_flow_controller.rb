@@ -29,11 +29,11 @@ class UserFlowController < ApplicationController
   end
  
   #------------指定したタグ一件--------------------------#-----------------------------------------------------------
-  def flowtag
+  def userflow_tag
 
     @tag = Tag.find_by(id: params[:id])
     if @tag.tag_type == true
-      respond_tag_type_error
+      respond_must_be_userflow
     else
       render json: { tag: @tag }
     end

@@ -1,9 +1,10 @@
 Rails.application.routes.draw do
 
   get "/userflow_tags", to: "user_flow#tag_index"
-  get "/userflow_tags/:id", to: "user_flow#flowtag"
+  get "/userflow_tags/:id", to: "user_flow#userflow_tag"
   
   get "/screenshot_tags", to: "screenshot#tag_index"
+  get "/screenshot_tags/:id", to: "screenshot#screenshot_tag"
 
   get "/screenshots" , to: "screenshot#latest"
   

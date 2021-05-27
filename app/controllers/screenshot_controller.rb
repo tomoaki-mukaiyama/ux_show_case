@@ -9,6 +9,15 @@ class ScreenshotController < ApplicationController
     end
     render json: {screenshot_tags: @tags_array}
   end
+  #------------指定のscreenshotタグ----------------------------#-----------------------------------------------------------
+  def screenshot_tag
+    @tag = Tag.find_by(id: params[:id])
+    if @tag.tag_type == false
+      respond_must_be_screenshot
+    else
+      render json: { tag: @tag }
+    end
+  end
   #------------最新のscreenshot取得----------------------------#-----------------------------------------------------------
   def latest
     
