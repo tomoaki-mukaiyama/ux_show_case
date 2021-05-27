@@ -118,7 +118,7 @@ class UserFlowController < ApplicationController
     userflow = UserFlow
     .find_by(id: params[:id])
     # .preload(:tags, :product, :platform)
-
+    # byebug
     if userflow == nil #データが無ければ404notfoundを返す
       response_not_found #application.rb
     else
