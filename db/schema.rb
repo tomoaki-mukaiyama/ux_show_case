@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_05_24_124738) do
+ActiveRecord::Schema.define(version: 2021_05_31_063919) do
 
   create_table "platforms", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "name", limit: 255
@@ -42,8 +42,8 @@ ActiveRecord::Schema.define(version: 2021_05_24_124738) do
     t.string "path", limit: 255
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "maintag_id"
-    t.index ["maintag_id"], name: "index_screen_shots_on_maintag_id"
+    t.bigint "tag_id"
+    t.index ["tag_id"], name: "index_screen_shots_on_tag_id"
     t.index ["user_flow_id"], name: "index_screen_shots_on_user_flow_id"
   end
 
@@ -78,19 +78,19 @@ ActiveRecord::Schema.define(version: 2021_05_24_124738) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "local_version"
-    t.bigint "maintag_id"
-    t.index ["maintag_id"], name: "fk_rails_903d4f1e72"
+    t.bigint "tag_id"
     t.index ["platform_id"], name: "index_user_flows_on_platform_id"
     t.index ["product_id"], name: "index_user_flows_on_product_id"
+    t.index ["tag_id"], name: "fk_rails_903d4f1e72"
   end
 
   add_foreign_key "screen_shot_tags", "screen_shots"
   add_foreign_key "screen_shot_tags", "tags"
-  add_foreign_key "screen_shots", "tags", column: "maintag_id"
+  add_foreign_key "screen_shots", "tags"
   add_foreign_key "screen_shots", "user_flows", name: "screen_shots_ibfk_1"
   add_foreign_key "user_flow_tags", "tags"
   add_foreign_key "user_flow_tags", "user_flows"
   add_foreign_key "user_flows", "platforms"
   add_foreign_key "user_flows", "products"
-  add_foreign_key "user_flows", "tags", column: "maintag_id"
+  add_foreign_key "user_flows", "tags"
 end

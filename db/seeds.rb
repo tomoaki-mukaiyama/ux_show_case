@@ -9,20 +9,19 @@
 # 6.times do |n|
 #     Tag.create!(
 #         tag_type:1,
-#         isTop: rand(2),
-#         isRecommend: rand(2),
-#         name: "tag_name",
 #         slug: "search#{n + 1}"
 #     )
 # end
-# Tag.all[0].update!(tag_type:0)
-# Tag.all[1].update!(tag_type:0)
+# tag_type = [0,0,1,1,1,1]
+# 6.times do |a|
+#     Tag.all[a-1].update!(tag_type: tag_type[a-1])
+# end
 # #-------------------------------------------------------------------
-# Tag.all.each do |n|
+# Tag.where(tag_type: 0).all.each do |n|
 #     n.user_flows.create!(
 #         product_id: 1,
 #         platform_id: 1,
-#         maintag_id: [1,2]
+#         tag_id: [1,2]
 #     )
 # end
 
@@ -39,7 +38,7 @@
 # main_tag=[3,4,5,6,3,4,5,6]
 # 2.times do |n|
 #     ScreenShot.all.each do |ss|
-#         ss.update!(maintag_id: main_tag[ss.id - 1])
+#         ss.update!(tag_id: main_tag[ss.id - 1])
 #     end
 # end
 # #-------------------------------------------------------------------

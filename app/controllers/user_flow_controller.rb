@@ -75,7 +75,7 @@ class UserFlowController < ApplicationController
           .preload(:tags, :product, :platform)
           .find_by(id: userflow.id)
           .as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])     #hash1 所有タグ一覧
-          maintag = userflow.tags.find_by(id: userflow.maintag_id).as_json(root:"maintag")
+          maintag = userflow.tags.find_by(id: userflow.tag_id).as_json(root:"maintag")
           hash = hash.merge(maintag)
 
           if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
@@ -92,7 +92,7 @@ class UserFlowController < ApplicationController
         
         @userflows.each do|userflow|
           hash = userflow.as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
-          maintag = userflow.tags.find_by(id: userflow.maintag_id).as_json(root:"maintag")
+          maintag = userflow.tags.find_by(id: userflow.tag_id).as_json(root:"maintag")
           hash = hash.merge(maintag)
 
           if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
@@ -123,7 +123,7 @@ class UserFlowController < ApplicationController
       response_not_found #application.rb
     else
 
-      userflow_main_tag = userflow.tags.find_by(id: userflow.maintag_id).as_json(root:"maintag")
+      userflow_main_tag = userflow.tags.find_by(id: userflow.tag_id).as_json(root:"maintag")
 
       userflow = userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags]) 
       
@@ -149,7 +149,7 @@ class UserFlowController < ApplicationController
 
       @screenshots = @userflow.screen_shots.as_json(include: :tags)
       screenshot_main_tag = []
-      @userflow.screen_shots.each {|n|screenshot_main_tag << n.tags.find_by(id: n.maintag_id)}
+      @userflow.screen_shots.each {|n|screenshot_main_tag << n.tags.find_by(id: n.tag_id)}
       
       @screenshots_with_tags = []
       @screenshots.each do|shots|
@@ -187,7 +187,7 @@ class UserFlowController < ApplicationController
       
       main_tag = []
       userflows.each do |userflow|
-        main_tag << userflow.tags.find_by(id: userflow.maintag_id)
+        main_tag << userflow.tags.find_by(id: userflow.tag_id)
       end
       
       array = []
@@ -225,7 +225,7 @@ class UserFlowController < ApplicationController
       userflow_array = []
       userflows.each do |userflow|
         userflow_product_platform = userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
-        maintag = userflow.tags.find_by(id: userflow.maintag_id).as_json(root:"maintag")
+        maintag = userflow.tags.find_by(id: userflow.tag_id).as_json(root:"maintag")
         if userflows.count != 1 #userflowが複数ある場合、配列に入れる
           userflow_array << userflow_product_platform.merge(maintag)
         else
