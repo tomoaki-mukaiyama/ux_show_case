@@ -63,19 +63,19 @@ class UserFlowController < ApplicationController
       @userflows_array = []
       if params[:tag] #ーーーーーータグ指定ありーーーーーーー
         
-        @userflows = UserFlow.eager_load(:tags)   #タグ絞り込み　＆　全件取得
+        @userflows = UserFlow.eager_load(:tags,:tag)   #タグ絞り込み　＆　全件取得
         .where(tags: {id: params[:tag]})
         .order(created_at: :desc)
         .limit(page_size)
         .offset(page_num * page_size)
         
-        # byebug
         @userflows.each do|userflow|
           hash = UserFlow
           .preload(:tags, :product, :platform)
           .find_by(id: userflow.id)
           .as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])     #hash1 所有タグ一覧
-          maintag = userflow.tags.find_by(id: userflow.tag_id).as_json(root:"maintag")
+          # byebug
+          maintag = userflow.tag.as_json(root:"maintag")
           hash = hash.merge(maintag)
 
           if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
@@ -92,7 +92,7 @@ class UserFlowController < ApplicationController
         
         @userflows.each do|userflow|
           hash = userflow.as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
-          maintag = userflow.tags.find_by(id: userflow.tag_id).as_json(root:"maintag")
+          maintag = userflow.tag.as_json(root:"maintag")
           hash = hash.merge(maintag)
 
           if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
@@ -137,8 +137,6 @@ class UserFlowController < ApplicationController
   #------------動画のスクショ一覧取得----------------#-----------------------------------------------------------
   # /userflows/[userflow_id]/screen_shot 
   def screenshots
-
-    #絞り込みでターゲットのidを取得 #eager_loadではスクショのタグを芋づる取得できない為、そのidでpreloadでfind_byする
     @userflow = UserFlow
     .preload(:tags)
     .find_by(id: params[:id])
@@ -146,19 +144,12 @@ class UserFlowController < ApplicationController
     if @userflow == nil #データが無ければ404notfoundを返す
       response_not_found #application.rb
     else
-
-      @screenshots = @userflow.screen_shots.as_json(include: :tags)
-      screenshot_main_tag = []
-      @userflow.screen_shots.each {|n|screenshot_main_tag << n.tags.find_by(id: n.tag_id)}
-      
       @screenshots_with_tags = []
-      @screenshots.each do|shots|
-        @screenshots_with_tags << shots.merge(screenshot_main_tag[@screenshots_with_tags.count].as_json(root:"maintag"))
+      @userflow.screen_shots.each do|flow_shot|
+        @screenshots_with_tags << flow_shot.as_json(include: :tags).merge(flow_shot.tag.as_json(root:"maintag"))
       end 
       render json: {screenshots: @screenshots_with_tags}
-      
     end
-    
   end
   #------------当該プロダクトの他の動画取得-------------------#-----------------------------------------------------------
   # /products/[product_id]/ プロダクトの他の動画一覧
@@ -225,7 +216,8 @@ class UserFlowController < ApplicationController
       userflow_array = []
       userflows.each do |userflow|
         userflow_product_platform = userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
-        maintag = userflow.tags.find_by(id: userflow.tag_id).as_json(root:"maintag")
+        maintag = userflow.tag.as_json(root:"maintag")
+        # byebug
         if userflows.count != 1 #userflowが複数ある場合、配列に入れる
           userflow_array << userflow_product_platform.merge(maintag)
         else
@@ -233,7 +225,6 @@ class UserFlowController < ApplicationController
         end
       end
 
-      
       render json: {userflows: userflow_array}
     end
     
