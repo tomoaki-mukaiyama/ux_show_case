@@ -1,5 +1,11 @@
 class UserFlowController < ApplicationController
-
+  #------------動画数＆プロダクト数--------------------------#-----------------------------------------------------------
+  def stats
+    userflow_count = { userflow_count: UserFlow.all.count}
+    product_count = { product_count: Product.all.count}
+    counts = userflow_count.merge(product_count)
+    render json: { counts: counts }
+  end
   #------------タグ一覧--------------------------#-----------------------------------------------------------
   def tag_index
     if params[:flg] == "recommend"

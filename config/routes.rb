@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
 
+  get "/stats", to: "user_flow#stats"
   get "/tags", to: "user_flow#tag_index"
   get "/tags/:id", to: "user_flow#tag"
   
