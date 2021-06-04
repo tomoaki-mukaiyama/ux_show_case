@@ -47,6 +47,13 @@ test:
 #   production:
 #     url: <%= ENV['DATABASE_URL'] %>
 #
+
+staging:
+  <<: *default
+  database: <%= ENV['STAGING_HEROKU_NAME'] %>
+  username: <%= ENV['STAGING_HEROKU_USERNAME'] %>
+  password: <%= ENV['STAGING_HEROKU_PASSWORD'] %>
+
 production:
   <<: *default
   database: <%= ENV['DB_HEROKU_NAME'] %>
