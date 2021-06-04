@@ -27,7 +27,11 @@ class UserFlowController < ApplicationController
   #------------指定したタグ一件--------------------------#-----------------------------------------------------------
   def tag
     @tag = Tag.find_by(id: params[:id])
+    if @tag == nil
+      return response_not_found
+    else
       render json: { tag: @tag }
+    end
   end
   #------------最新のuserflow(動画)取得----------------#-----------------------------------------------------------
   def latest
@@ -51,7 +55,6 @@ class UserFlowController < ApplicationController
       
       @userflows_array = []
       if params[:tag] #ーーーーーータグ指定ありーーーーーーー
-        
         @userflows = UserFlow.eager_load(:tags)   #タグ絞り込み　＆　全件取得
         .where(tags: {id: params[:tag]})
         .order(created_at: :desc)
@@ -140,21 +143,26 @@ class UserFlowController < ApplicationController
     if params[:page].to_s.empty? || params[:limit].to_s.empty? #pageとlimitのリクエスト不備の場合エラーを返す
       response_bad_request #(application_controller.rb)
     else
-      userflows = UserFlow.find_by(id: params[:id])
-      .product.user_flows
-      .where.not(id: params[:id])
-      .limit(page_size)
-      .offset(page_num * page_size)
-      userflow_array = []
-      userflows.each do |userflow|
-        userflow_product_platform = userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
-        if userflows.count != 1 #userflowが複数ある場合、配列に入れる
-          userflow_array << userflow_product_platform
-        else
-          userflow_array = userflow_product_platform #一つの場合一つだけ出力
+      # byebug
+      if UserFlow.find_by(id: params[:id]) == nil
+         return response_not_found
+      else
+        userflows = UserFlow.find_by(id: params[:id])
+        .product.user_flows
+        .where.not(id: params[:id])
+        .limit(page_size)
+        .offset(page_num * page_size)
+        userflow_array = []
+        userflows.each do |userflow|
+          userflow_product_platform = userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
+          if userflows.count != 1 #userflowが複数ある場合、配列に入れる
+            userflow_array << userflow_product_platform
+          else
+            userflow_array = userflow_product_platform #一つの場合一つだけ出力
+          end
         end
+        render json: {userflows: userflow_array}
       end
-      render json: {userflows: userflow_array}
     end
   end
   #-----------------------------------------------------------#-----------------------------------------------------------
