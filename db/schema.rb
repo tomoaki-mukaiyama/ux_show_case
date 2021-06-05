@@ -10,47 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_04_26_040459) do
+ActiveRecord::Schema.define(version: 2021_06_03_155227) do
 
   create_table "platforms", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.string "name"
+    t.string "name", limit: 255
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.string "slug"
   end
 
   create_table "products", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.string "name"
-    t.string "description"
+    t.string "name", limit: 255
+    t.string "description", limit: 255
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-  end
-
-  create_table "screen_shot_tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.bigint "screen_shot_id", null: false
-    t.bigint "tag_id", null: false
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["screen_shot_id"], name: "index_screen_shot_tags_on_screen_shot_id"
-    t.index ["tag_id"], name: "index_screen_shot_tags_on_tag_id"
-  end
-
-  create_table "screen_shots", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.bigint "product_id", null: false
-    t.bigint "platform_id", null: false
-    t.string "path"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["platform_id"], name: "index_screen_shots_on_platform_id"
-    t.index ["product_id"], name: "index_screen_shots_on_product_id"
+    t.string "icon_path"
+    t.string "slug"
   end
 
   create_table "tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
-    t.boolean "IsFlowTag"
     t.string "isTop"
     t.string "isRecommend"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.string "name"
+    t.string "slug", null: false
+    t.index ["slug"], name: "index_tags_on_slug", unique: true
   end
 
   create_table "user_flow_tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
@@ -66,20 +51,18 @@ ActiveRecord::Schema.define(version: 2021_04_26_040459) do
     t.bigint "product_id", null: false
     t.bigint "platform_id", null: false
     t.string "bg_color"
-    t.string "icon_path"
+    t.string "thumbnail_path"
     t.string "version"
     t.string "video_time_string"
     t.string "video_path"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.integer "local_version"
+    t.string "title"
     t.index ["platform_id"], name: "index_user_flows_on_platform_id"
     t.index ["product_id"], name: "index_user_flows_on_product_id"
   end
 
-  add_foreign_key "screen_shot_tags", "screen_shots"
-  add_foreign_key "screen_shot_tags", "tags"
-  add_foreign_key "screen_shots", "platforms"
-  add_foreign_key "screen_shots", "products"
   add_foreign_key "user_flow_tags", "tags"
   add_foreign_key "user_flow_tags", "user_flows"
   add_foreign_key "user_flows", "platforms"
