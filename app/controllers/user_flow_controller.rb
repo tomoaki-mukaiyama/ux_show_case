@@ -98,6 +98,26 @@ class UserFlowController < ApplicationController
     end
   end
  
+    #------------動画詳細ページ取得----------------------------#-----------------------------------------------------------
+  # /userflows/[userflow_id] userflow１件
+  
+  def detail
+    userflow = UserFlow
+    .find_by(id: params[:id])
+
+    if userflow == nil #データが無ければ404notfoundを返す
+      response_not_found #application.rb
+    else
+
+
+      userflow = userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags]) 
+      
+
+      render json: {userflow: userflow}
+      
+    end
+  end
+  
   #------------当該プロダクトの他の動画取得-------------------#-----------------------------------------------------------
   # /products/[product_id]/userflows プロダクトの他の動画一覧
   def product_userflow
