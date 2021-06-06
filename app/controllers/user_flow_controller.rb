@@ -23,7 +23,6 @@ class UserFlowController < ApplicationController
     else
       tags_array = []
       Tag.all.each do |tag|
-        # byebug
         count = { count: tag.user_flows.count}
           tags_array << tag.as_json.merge(count)
       end
@@ -59,7 +58,7 @@ class UserFlowController < ApplicationController
       
       #全動画を最新順取得＆limit&page指定 => @userflowsに代入
       
-      @userflows_array = []
+      userflows_array = []
       if params[:tag] #ーーーーーータグ指定ありーーーーーーー
         @userflows = UserFlow.eager_load(:tags)   #タグ絞り込み　＆　全件取得
         .where(tags: {id: params[:tag]})
@@ -68,16 +67,11 @@ class UserFlowController < ApplicationController
         .offset(page_num * page_size)
         
         @userflows.each do|userflow|
-          userflow_hash = UserFlow
+          userflows_array << UserFlow
           .preload(:tags, :product, :platform)
           .find_by(id: userflow.id)
           .as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])     #hash1 所有タグ一覧
 
-          if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
-            @userflows_array <<  userflow_hash
-          else
-            @userflows_array =  userflow_hash #一つの場合一つだけ出力
-          end
         end
       else            #ーーーーーータグ指定なしーーーーーーー
         @userflows = UserFlow.preload(:tags, :product, :platform)
@@ -86,15 +80,12 @@ class UserFlowController < ApplicationController
         .offset(page_num * page_size)
         
         @userflows.each do|userflow|
-          userflow_hash = userflow.as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
-          if @userflows.count != 1 #userflowが複数ある場合、配列に入れる
-            @userflows_array << userflow_hash
-          else
-            @userflows_array = userflow_hash #一つの場合一つだけ出力
-          end
+          userflows_array << userflow_hash
+          userflow.as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
+
         end
       end
-      render json: {userflows: @userflows_array}
+      render json: {userflows: userflows_array}
     end
   end
  
@@ -109,9 +100,7 @@ class UserFlowController < ApplicationController
       response_not_found #application.rb
     else
 
-
       userflow = userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags]) 
-      
 
       render json: {userflow: userflow}
       
@@ -143,13 +132,13 @@ class UserFlowController < ApplicationController
       .limit(page_size)
       .offset(page_num * page_size)
       
-      array = []
+      userflow_array = []
       userflows_tags = userflows.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}}, :tags])
       userflows_tags.each do |userflow|
-        array << userflow
+        userflow_array << userflow
       end
 
-      render json: {userflows: array}
+      render json: {userflows: userflow_array}
     end
   end
   #------------関連動画取得-------------------#-----------------------------------------------------------
@@ -180,12 +169,7 @@ class UserFlowController < ApplicationController
         .offset(page_num * page_size)
         userflow_array = []
         userflows.each do |userflow|
-          userflow_product_platform = userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
-          if userflows.count != 1 #userflowが複数ある場合、配列に入れる
-            userflow_array << userflow_product_platform
-          else
-            userflow_array = userflow_product_platform #一つの場合一つだけ出力
-          end
+          userflow_array << userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
         end
         render json: {userflows: userflow_array}
       end
