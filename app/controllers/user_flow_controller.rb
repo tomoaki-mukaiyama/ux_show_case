@@ -80,8 +80,7 @@ class UserFlowController < ApplicationController
         .offset(page_num * page_size)
         
         @userflows.each do|userflow|
-          userflows_array << userflow_hash
-          userflow.as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
+          userflows_array << userflow.as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
 
         end
       end
