@@ -70,7 +70,7 @@ class UserFlowController < ApplicationController
           userflows_array << UserFlow
           .preload(:tags, :product, :platform)
           .find_by(id: userflow.id)
-          .as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])     #hash1 所有タグ一覧
+          .as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path, :quote_url]}},{platform:{only:[:id,:name, :slug]}},:tags])     #hash1 所有タグ一覧
 
         end
       else            #ーーーーーータグ指定なしーーーーーーー
@@ -80,7 +80,7 @@ class UserFlowController < ApplicationController
         .offset(page_num * page_size)
         
         @userflows.each do|userflow|
-          userflows_array << userflow.as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
+          userflows_array << userflow.as_json(include: [{product:{only:[:id,:name, :description, :slug, :icon_path, :quote_url]}},{platform:{only:[:id,:name, :slug]}},:tags])
 
         end
       end
@@ -99,7 +99,7 @@ class UserFlowController < ApplicationController
       response_not_found #application.rb
     else
 
-      userflow = userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags]) 
+      userflow = userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path, :quote_url]}},{platform:{only:[:id,:name, :slug]}},:tags]) 
 
       render json: {userflow: userflow}
       
@@ -132,7 +132,7 @@ class UserFlowController < ApplicationController
       .offset(page_num * page_size)
       
       userflow_array = []
-      userflows_tags = userflows.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}}, :tags])
+      userflows_tags = userflows.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path, :quote_url]}},{platform:{only:[:id,:name, :slug]}}, :tags])
       userflows_tags.each do |userflow|
         userflow_array << userflow
       end
@@ -168,7 +168,7 @@ class UserFlowController < ApplicationController
         .offset(page_num * page_size)
         userflow_array = []
         userflows.each do |userflow|
-          userflow_array << userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path]}},{platform:{only:[:id,:name, :slug]}},:tags])
+          userflow_array << userflow.as_json(include:[{product:{only:[:id,:name, :description, :slug, :icon_path, :quote_url]}},{platform:{only:[:id,:name, :slug]}},:tags])
         end
         render json: {userflows: userflow_array}
       end
