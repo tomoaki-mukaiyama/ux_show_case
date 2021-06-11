@@ -26,7 +26,7 @@ ActiveRecord::Schema.define(version: 2021_06_08_133919) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "icon_path"
     t.string "slug"
-    t.string "quote_url"
+    t.text "quote_url"
   end
 
   create_table "tags", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
