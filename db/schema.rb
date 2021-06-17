@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_08_135929) do
+ActiveRecord::Schema.define(version: 2021_06_17_140941) do
 
   create_table "platforms", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "name", limit: 255
@@ -36,6 +36,7 @@ ActiveRecord::Schema.define(version: 2021_06_08_135929) do
     t.datetime "updated_at", precision: 6, null: false
     t.string "name"
     t.string "slug", null: false
+    t.string "tag_type"
     t.index ["slug"], name: "index_tags_on_slug", unique: true
   end
 
@@ -52,14 +53,11 @@ ActiveRecord::Schema.define(version: 2021_06_08_135929) do
     t.bigint "product_id", null: false
     t.bigint "platform_id", null: false
     t.string "bg_color"
-    t.string "thumbnail_path"
+    t.string "screenshot_path"
     t.string "version"
-    t.string "video_time_string"
-    t.string "video_path"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.integer "local_version"
-    t.string "title"
     t.index ["platform_id"], name: "index_user_flows_on_platform_id"
     t.index ["product_id"], name: "index_user_flows_on_product_id"
   end
