@@ -60,7 +60,6 @@ class UserFlowController < ApplicationController
       
       userflows_array = []
       if params[:tag] #ーーーーーータグ指定ありーーーーーーー
-        byebug
         @userflows = UserFlow.eager_load(:tags)   #タグ絞り込み　＆　全件取得
         .where(tags: {id: params[:tag]})
         .order(created_at: :desc)
