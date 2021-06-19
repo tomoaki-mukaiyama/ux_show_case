@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_06_17_140941) do
+ActiveRecord::Schema.define(version: 2021_06_19_042823) do
 
   create_table "platforms", options: "ENGINE=InnoDB DEFAULT CHARSET=utf8mb4", force: :cascade do |t|
     t.string "name", limit: 255
@@ -53,7 +53,7 @@ ActiveRecord::Schema.define(version: 2021_06_17_140941) do
     t.bigint "product_id", null: false
     t.bigint "platform_id", null: false
     t.string "bg_color"
-    t.string "screenshot_path"
+    t.string "screenshot_path", null: false
     t.string "version"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
