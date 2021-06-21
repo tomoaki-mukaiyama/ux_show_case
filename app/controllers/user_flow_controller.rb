@@ -61,11 +61,11 @@ class UserFlowController < ApplicationController
       userflows_array = []
       if params[:tag] #ーーーーーータグ指定ありーーーーーーー
         @userflows = UserFlow.eager_load(:tags)   #タグ絞り込み　＆　全件取得
-        .where(tags: {id: params[:tag]})
+        .where(tags: {id: params[:tag].split(",")})
         .order(created_at: :desc)
         .limit(page_size)
         .offset(page_num * page_size)
-        
+        # byebug
         @userflows.each do|userflow|
           userflows_array << UserFlow
           .preload(:tags, :product, :platform)
