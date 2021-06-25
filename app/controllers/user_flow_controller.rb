@@ -23,7 +23,7 @@ class UserFlowController < ApplicationController
       render json: { tags: tags_array }
     else
       tags_array = []
-      Tag.all.each do |tg|
+      Tag.all.each do |tag|
         count = { count: tag.user_flows.count}
           tags_array << tag.as_json.merge(count)
       end
