@@ -26,6 +26,8 @@ gem 'rack-cors'
 
 gem "dotenv-rails" #mysqlパスワードとかを環境変数として扱うやつ
 gem 'mysql2', '~> 0.5.3'
+gem "sentry-ruby"
+gem "sentry-rails"
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
