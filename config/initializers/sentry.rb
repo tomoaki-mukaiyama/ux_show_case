@@ -11,6 +11,6 @@
     config.traces_sampler = lambda do |context|
       true
     end
-    config.enabled_environments = %w[staging]
+    config.enabled_environments = %w[staging production]
     config.environment = Rails.env
   end
