@@ -123,7 +123,6 @@ class UserFlowController < ApplicationController
       end
   end
   #-----------------------------------------------------------#-----------------------------------------------------------
-  
   private
 
   def set_pagination_values
